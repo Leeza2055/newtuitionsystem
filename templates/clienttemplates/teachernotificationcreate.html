@@ -1,0 +1,21 @@
+{% extends "clienttemplates/teacherbase.html" %}
+{% block content %}
+                <div class="container-fluid">
+                    <div class="row">
+                        <div class="outer-w3-agile col-xl mt-3 mr-xl-3">
+                            <h4 class="tittle-w3-agileits mb-4">Hiring Form</h4>
+                            <form id="form1" method="post">
+                                {% csrf_token %}
+                                {% for hire in hires %}
+                                    <input type="hidden" name="" value="{{hire.accept}}">  
+                                {% endfor %}
+                                Teacher:{{form.teacher}}
+                                Student :{{form.student}}
+                                {{form.error}}
+                                <button type="submit" id="btnSubmit">Submit</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+{% endblock %}

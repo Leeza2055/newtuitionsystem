@@ -1,0 +1,10 @@
+{% extends "admintemplates/base.html" %}
+{% block content %}
+<h4>Register Form</h4>
+<form enctype="multipart/form-data" method="POST">
+	{% csrf_token %}
+	{{form.as_p}}
+	{{error}}
+	<button>Signup</button>	
+</form>
+{% endblock %}

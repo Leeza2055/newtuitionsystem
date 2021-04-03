@@ -1,0 +1,10 @@
+{% extends "clienttemplates/base.html" %}
+{% block content %}
+<h3>Search</h3>
+<hr>
+{% for teacher in searched_teachers %}
+<li><a href="{% url 'hometuitionapp:teacherdetail' teacher.pk %}">{{teacher.name}}</a></li>
+{% empty %}
+<h5>No results found...</h5>
+{% endfor %}
+{% endblock %}

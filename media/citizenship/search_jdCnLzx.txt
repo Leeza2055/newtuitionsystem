@@ -1,0 +1,125 @@
+class StudentHomeView(StudentRequiredMixin, ListView):
+    template_name = "clienttemplates/studenthome.html"
+
+    def get(self, request):
+        qs = Teacher.objects.all()
+        subject_query = request.GET.get('subject')
+        location_query = request.GET.get('location')
+        
+        # if (subject_query != '' and location_query != '') and (subject_query is not None and location_query is not None):
+        #     qset = qs.filter(Q(subject__name__icontains=subject_query), Q(address__icontains=location_query)).distinct()
+        #     print(qset)
+        #     if not qset:
+        #         queryset = qs.order_by("-id")
+        #         messages.error(request, "No results found.")          
+        #         return render(request, "clienttemplates/studenthome.html", {
+        #             'teacher_list' : queryset
+        #         })  
+        #     else:
+        #         return render(request, "clienttemplates/studenthome.html", {
+        #             'teacher_list' : qset
+        #         })
+
+        # elif subject_query != '' and subject_query is not None:
+        #     qset = qs.filter(subject__name__icontains=subject_query) 
+        #     if not qset:
+        #         queryset = qs.order_by("-id")  
+        #         messages.error(request, "No results found.")        
+        #         return render(request, "clienttemplates/studenthome.html", {
+        #             'teacher_list' : queryset
+        #         })
+        #     else:
+        #         return render(request, "clienttemplates/studenthome.html", {
+        #             'teacher_list' : qset
+        #         })
+
+        # elif location_query != '' and location_query is not None:
+        #     qset = qs.filter(address__icontains=location_query)
+        #     if not qset:
+        #         queryset = qs.order_by("-id")
+        #         messages.error(request, "No results found.")          
+        #         return render(request, "clienttemplates/studenthome.html", {
+        #             'teacher_list' : queryset
+        #         })  
+        #     else:
+        #         return render(request, "clienttemplates/studenthome.html", {
+        #             'teacher_list' : qset
+        #         })
+
+        # else:
+        qset = qs.order_by("-id")
+        paginator = Paginator(qset, 2)
+        page_number = request.GET.get('page', 1)
+        page = paginator.get_page(page_number)
+
+        if page.has_next():
+            next_url = f'?page={page.next_page_number()}'
+        else:
+            next_url = ''
+        if page.has_previous():
+            prev_url = f'?page={page.previous_page_number()}'
+        else:
+            prev_url = ''
+
+        return render(request, "clienttemplates/studenthome.html", { 'teacher_list' : page, 'next_page_url' : next_url, 'prev_page_url' : prev_url
+        })
+
+
+
+class AdminAjaxTeacherSearchView(View):
+    def get(self, request, *args, **kwargs):
+        subject = self.request.GET.get("subject")
+        location = self.request.GET.get("location")
+        if subject != "" and location != "":
+            # teacherlist = Teacher.objects.all()
+            # listobj = teacherlist.filter(subject__a=subject)
+            teacherlist = Teacher.objects.filter(Q(subject__name__icontains=subject) |
+            Q(address__icontains=location)
+            )
+            # teacher = Teacher.objects.filter(subject=subject)
+            print("sdafdsf")
+            print(teacherlist)
+
+        elif subject != "" and location == "":
+            teacherlist = Teacher.objects.filter(Q(subject__name__icontains=subject))
+            print(subject)
+            print(teacherlist)
+        
+        elif location != "" and subject == "" :
+            teacherlist = Teacher.objects.filter(Q(address__icontains=location))
+            print(location)
+            print(teacherlist)
+        else:
+            teacherlist = Teacher.objects.all()
+
+
+        page = self.request.GET.get("page", 1)
+        paginator = Paginator(teacherlist, 1)
+        try:
+            results = paginator.page(page)
+        except PageNotAnInteger:
+            results = paginator.page(1)
+        except EmptyPage:
+            results = paginator.page(paginator.num_pages)
+        print(results, "\n page ++++++++++++++++++++++++++")
+
+
+
+        # page = self.request.GET.get('page', 1)
+        # paginator = Paginator(teacherlist, 1)
+
+        # results = paginator.get_page(1)
+
+
+        # try:
+        #     results = paginator.page(page)
+        # except PageNotAnInteger:
+        #     results = paginator.page(1)
+        # except EmptyPage:
+        #     results = paginator.page(paginator.num_pages)
+
+        return render(self.request, 'clienttemplates/ajaxteachersearch.html', {
+            'teacherlist': results, 'subject': subject, 'location': location
+        })
+
+        # return JsonResponse({"message": "success"})

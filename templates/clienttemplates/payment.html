@@ -1,0 +1,33 @@
+{% extends "clienttemplates/studentbase.html" %}
+{% load static %}
+<link rel="stylesheet" href="{% static 'clientstatic/css/login.css' %}" type="text/css" media="all">
+{% block css %}
+<style>
+.payment {
+    width: 100%;
+}
+</style>
+{% endblock %}
+{% block content %}
+<div class="login-section">
+<div class="flex-container">
+<div class="flex-group">	
+<h3>Payment Form</h3>
+</div>
+<form class="form-group" method="POST">
+<!-- Cross Site Request Forgery refers to attempts to send request from an external site while pretending to be the origin application which is often use by attackers to execute malicious actions in the server.-->
+<!-- Django protects against CSRF attacks by generating a CSRF token in the server -->
+	
+	
+    <div class="flex-group mt-3" style="width: 100%;">
+        Amount: <input type="text" name="" value="2000">
+    </div>
+    <br>
+	<div class="flex-group">	
+	<button class="btn btn-primary login-btn" type="submit" >Submit</button>
+</div>
+</form>
+</div>
+</div>
+
+{% endblock %}

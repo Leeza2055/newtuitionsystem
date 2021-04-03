@@ -1,0 +1,33 @@
+{% extends "clienttemplates/base.html" %}
+{% load static %}
+{% block content %}
+<!-- {% for notification  in teachernotificationlist %}
+<a href="{% url 'hometuitionapp:teachernotificationdetail' notification.pk %}"><li>{{notification.student}} hired {{notification.teacher}}</li></a>
+
+                
+{% endfor %} -->
+    
+<div class="container-fluid">
+    <div class="row">
+        <div class="outer-w3-agile col-xl">
+            <div class="work-progres">
+                <h4 class="tittle-w3-agileits mb-4">Notification</h4>
+                <hr>
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <tbody>
+                            {% for notification  in teachernotificationlist %}
+                            		<tr>
+                            			<td>{{forloop.counter}}</td>
+                            			<td><a href="{% url 'hometuitionapp:teachernotificationdetail' notification.pk %}" >{{notification.student}} hired {{notification.teacher}}</a></td>
+                            		</tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

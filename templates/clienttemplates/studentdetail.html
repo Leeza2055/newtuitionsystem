@@ -1,0 +1,20 @@
+{% extends "clienttemplates/studentbase.html" %}
+{% load static %}
+{% block content %}
+<h1>{{studentdetail.name}}</h1>
+<p>Phone_no: {{studentdetail.phone_no}}</p>
+<p>Email:{{studentdetail.email}}</p>
+<p>Address:{{studentdetail.address}}</p>
+<p>Report Card:{{studentdetail.report_card}}</p>
+<p>Course:{{studentdetail.course}}</p>
+<p>Subject:{{studentdetail.subject}}</p>
+<div class="mb-3">
+
+    <a class="btn btn-primary" style="width: 25%;"
+    href="{% url 'hometuitionapp:studentupdate' request.user.student.id %}">Update</a>
+    
+    <a class="btn btn-danger" style="width: 25%;" href="{% url 'hometuitionapp:studentdelete' request.user.student.id %}">Delete</a>
+</div>
+{% endblock %}
+
+

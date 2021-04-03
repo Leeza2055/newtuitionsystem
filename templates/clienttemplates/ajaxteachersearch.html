@@ -1,0 +1,84 @@
+<div class="row">
+    <div class="col-md-12">
+        <div class="container row mt-2 mb-2" style="width: 70%; margin-left: auto; margin-right: auto;">
+            {% for teacher in teacherlist %}
+            <div class="col-4">
+                <img src="{{teacher.photo.url}}"/>
+                <h1><a href="{% url 'hometuitionapp:teacherprofile' teacher.pk %}">{{teacher.name}}</a></h1>
+                <h2>Education:{{teacher.education}}</h2>
+                <h2>Experience: {{teacher.experience}} </h2>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    <div class="col-md-12">
+        <div class="container">
+            {% if teacherlist.has_other_pages %}
+            <nav aria-label="...">
+                <ul class="pagination">
+                    {% if teacherlist.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link paginator_click" data-href="?page={{teacherlist.previous_page_number }}&subject={{subject}}&location={{location}}">Previous</a>
+                    </li>
+                    {% else %}
+                    <li class="page-item disabled">
+                        <a class="page-link" href="#" tabindex="-1" aria-disabled="true">Previous</a>
+                    </li>
+                    {% endif %}
+            
+                    {% for i in teacherlist.paginator.page_range %}
+                    <!-- {{i}}
+                    {% if teacherlist.number == i %}
+                    <li class="page-item active" aria-current="page">
+                        <a class="page-link" href="?page={{ i }}&subject={{subject}}&location={{location}}"> {{ i }} <span class="sr-only">(current)</span></a>
+                    </li>
+
+                    {% elif i > teacherlist.number|add:-3 and i < teacherlist.number|add}
+                    {% endif %} -->
+
+                        {% if teacherlist.number == i %}
+                            <li class="page-item active" aria-current="page">
+                                    <a class="page-link disabled" href="#"> {{ i }} <span class="sr-only">(current)</span></a>
+                            </li>
+                        
+                        {% elif i > teacherlist.number|add:-3 and i < teacherlist.number|add:3 %}
+                            <li class="page-item">
+                                <a class="page-link paginator_click" data-href="?page={{ i }}&subject={{subject}}&location={{location}}"> {{ i }} </a>
+                            </li>
+                        {% endif %}
+            
+                    {% endfor %}
+                    {% if teacherlist.has_next %}
+                    <li class="page-item">
+                        <a class="page-link paginator_click" data-href="?page={{teacherlist.next_page_number }}&subject={{subject}}&location={{location}}">Next</a>
+                        <!-- <a class="page-link paginator_click" data-href="{{ next_page_url }}">Next</a> -->
+                    </li>
+                    {% else %}
+                    <li class="page-item disabled">
+                        <a class="page-link" href="#">Next</a>
+                    </li>
+                    {% endif %}
+                </ul>
+              </nav>
+              {% endif %}
+        </div> 
+    </div>
+</div>
+
+{% block js %}
+<script>
+    $('.paginator_click').on('click', function(e){
+        e.preventDefault();
+        var url1 = $(this).data('href');
+        $.ajax({
+            url: "{% url 'hometuitionapp:adminajaxteachersearch' %}"+url1,
+            data: {
+                
+            },
+            success: function(data){
+                $("#ajaxsearch").html(data);
+            }
+        })
+    })
+</script>
+{% endblock %}

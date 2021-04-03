@@ -1,0 +1,37 @@
+{% load static %}
+	<link rel="stylesheet" href="{% static 'adminstatic/css/login.css' %}">
+	<!-- Bootstrap Css -->
+	<link href="{% static 'adminstatic/css/bootstrap.css' %}" rel="stylesheet" type="text/css" media="all" />
+	<!-- <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css"> -->
+	<!-- Bootstrap Css -->
+	<!-- Fontawesome Css -->
+	<link href="{% static 'adminstatic/css/fontawesome-all.css' %}" rel="stylesheet">
+{% block content %} 
+<div class="login-section">
+	<div class="flex-container">
+	<div class="flex-group">	
+	<h3>Admin Login </h3>
+	</div>
+	<form class="form-group" method="POST">
+	<!-- Cross Site Request Forgery refers to attempts to send request from an external site while pretending to be the origin application which is often use by attackers to execute malicious actions in the server.-->
+	<!-- Django protects against CSRF attacks by generating a CSRF token in the server -->
+		{% csrf_token %}
+		<div class="flex-group">
+		{{form.as_p}}
+		</div>
+		{% if error %}
+		<div class="alert alert-danger alert-dismissible fade show mt-2 flex-group">
+			{{error}}
+			<button type="button" class="close" data-dismiss="alert">&times;</button>
+		</div>
+		{% endif %}
+		<div class="flex-group mt-3">	
+			<button type="submit" class="btn btn-primary">Login</button>
+		</div>
+	</form>
+	</div>
+	</div>
+{% endblock %}
+<!-- Js for bootstrap working-->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script src="{% static 'adminstatic/js/bootstrap.min.js' %}"></script>

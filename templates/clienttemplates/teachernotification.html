@@ -1,0 +1,23 @@
+{% extends "clienttemplates/teacherbase.html" %}
+{% block content %}
+<h1>Hiring </h1>
+<a href="#" class="btn btn-success show_notification">Hire</a>
+
+<div>
+	<input type="hidden" value="{{request.user}} Hired you">
+	<input type="hidden" name="teacher_id" id="teacher_id">
+	<button class = "btn btn-info btn-block" type="button">Hire</button>
+
+</div>
+{% endblock %}
+
+{% block js %}
+<script>
+	$(".show_notification").click(function(){
+		var teacher_id=$(this).parents("tr").children("td:eq(0)").text();
+		console.log(teacher_id);
+		$("#teacher_id").val(teacher_id);
+	});
+	
+</script>
+{% endblock}

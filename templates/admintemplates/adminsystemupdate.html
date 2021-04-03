@@ -1,0 +1,11 @@
+{% extends "admintemplates/base.html" %}
+{% load static %}
+{% block content %}
+<h4>System Update Form</h4>
+<!-- enctype='multipart/form-data is an encoding type that allows files to be sent through a POST -->
+<form enctype="multipart/form-data" method="post">
+	{% csrf_token %}
+	{{form.as_p}}
+	<button>Submit data</button>
+</form>
+{% endblock %}

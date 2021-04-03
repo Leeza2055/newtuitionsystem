@@ -1,0 +1,127 @@
+{% extends "clienttemplates/base.html" %}
+{% load static %}
+{% block content %}
+<a href="{% url 'hometuitionapp:logout' %}">Logout</a>
+<h1 style="text-align: center;">Teacher List</h1>
+<h3>Welcome {{request.user}}</h3>
+<a href="{% url 'hometuitionapp:studentnotificationlist' %}">Notification</a>
+<a href="{% url 'hometuitionapp:paymentstatus' %}">Payment</a>
+
+{% if messages %}
+    	<div class="col-lg-3 color03">
+        	<ul class="messages">
+            	{% for message in messages %}
+                	<li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+            	{% endfor %}
+        	</ul>
+    	</div>
+{% endif %}
+<a href="{% url 'hometuitionapp:studentdetail' request.user.student.id %}">Profile</a>
+
+<form method="GET" action="">
+	<div class="container form-row my-2" style="width: 70%; margin-left: auto; margin-right: auto;">
+		<div class="form-group col-5">
+			<div class="input-group">
+				<input class="form-control py-2 border border-dark rounded subject_val" type="search" name="subject" placeholder="Subject" />
+			</div>
+		</div>
+		<div class="form-group col-5">
+			<div class="input-group">
+				<input class="form-control py-2 border border-dark rounded location_val" type="search" name="location" placeholder="Location" />
+			</div>
+		</div>   
+		<div class="form-group col-2">
+			<button type="submit" class="btn btn-primary" id="search_button">Search</button>
+		</div>       
+	</div>
+</form>
+
+<!-- Displaying error message -->
+{% for message in messages %}
+  <div class="alert {{ message.tags }} alert-dismissible" role="alert" style="width: 70%; margin-left: auto; margin-right: auto;">
+    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+      <span aria-hidden="true">&times;</span>
+    </button>
+    {{ message }}
+  </div>
+{% endfor %}
+
+<div id="ajaxsearch">
+	<div class="row">
+		<div class="col-md-12">
+			<div class="container row mt-2 mb-2" style="width: 70%; margin-left: auto; margin-right: auto;">
+				{% for teacher in teacher_list.object_list %}
+				<div class="col-4">
+					<img src="{{teacher.photo.url}}"/>
+					<h1><a href="{% url 'hometuitionapp:teacherprofile' teacher.pk %}">{{teacher.name}}</a></h1>
+					<h2>Education:{{teacher.education}}</h2>
+					<h2>Experience: {{teacher.experience}} </h2>
+				</div>
+				{% endfor %}
+			</div>
+		</div>
+		<div class="col-md-12">
+			<div class="container">
+				<nav aria-label="...">
+					<ul class="pagination">
+						<li class="page-item {% if not prev_page_url %}disabled {% endif %}">
+							<a class="page-link" href="{{ prev_page_url }}" tabindex="-1" aria-disabled="true">Previous</a>
+						</li>
+				
+						{% for n in teacher_list.paginator.page_range %}
+								{% if teacher_list.number == n %}
+									<li class="page-item active" aria-current="page">
+											<a class="page-link" href="?page={{ n }}"> {{ n }} <span class="sr-only">(current)</span></a>
+									</li>
+								
+								{% elif n > teacher_list.number|add:-3 and n < teacher_list.number|add:3 %}
+									<li class="page-item">
+										<a class="page-link" href="?page={{ n }}"> {{ n }} </a>
+									</li>
+								{% endif %}
+				
+						{% endfor %}
+						<li class="page-item {% if not next_page_url %}disabled {% endif %}">
+							<a class="page-link" href="{{ next_page_url }}">Next</a>
+						</li>
+					</ul>
+				  </nav>
+			</div>
+			
+			
+		</div>
+	</div>
+</div>
+
+{% endblock %}
+
+{% block js %}
+<script>
+
+	// search teacherlist using subject and location
+	$('#search_button').on('click', function(e){
+		e.preventDefault();
+		var subject = $('.subject_val').val();
+		var location = $('.location_val').val();
+		if(subject == "" && location == ""){
+			alert("Empty Fill")
+		}
+		else{
+			$.ajax({
+			url: "{% url 'hometuitionapp:adminajaxteachersearch' %}",
+			data: {
+				'subject': subject,
+				'location': location,
+			},
+			success: function(data){
+				// alert("success");
+				$('#ajaxsearch').html(data)
+			}
+		})
+		}
+		
+		
+	})
+</script>
+
+{% endblock %}

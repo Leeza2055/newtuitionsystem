@@ -1,0 +1,18 @@
+{% extends "admintemplates/base.html" %}
+{% load static %}
+{% block content %}
+<h3>{{teacherdetail.name}}</h3>
+<img src="{{teacherdetail.photo.url}}"/>
+<p>Gender: {{teacherdetail.gender}}</p>
+<p>Phone_no: {{teacherdetail.phone_no}}</p>
+<p>Email:{{teacherdetail.email}}</p>
+<p>Address:{{teacherdetail.address}}</p>
+<p>Education:{{teacherdetail.education}}</p>
+<p>Experience:{{teacherdetail.experience}}</p>
+<p>CV:{{teacherdetail.cv}}</p>
+<p>Citizenship:{{teacherdetail.citizenship}}</p>
+<p>Course:{{teacherdetail.course}}</p>
+<p>Subject:{{teacherdetail.subject}}</p>
+{% endblock %}
+
+

@@ -1,0 +1,17 @@
+{% extends "admintemplates/base.html" %}
+{% load static %}
+{% block content %}
+<!-- {{variable}} evaluates the variable and replaces it with the result. -->
+<!-- systemdetail is the context_object_name from AdminHomeTuitionSystemDetailView -->
+<!-- {{systemdetail.name}} will be replaced with the name attribute of the system object -->
+<h3>{{systemdetail.name}}</h3>
+<img src="{{systemdetail.logo.url}}"/>
+<p>{{systemdetail.about}}</p>
+<img src="{{systemdetail.about_image1.url}}"/>
+<img src="{{systemdetail.about_image2.url}}"/>
+<p>Email:{{systemdetail.email}}</p>
+<p>Phone No.:{{systemdetail.phone_no}}</p>
+<p>Facebook:{{systemdetail.facebook}}</p>
+
+{% endblock %}
+

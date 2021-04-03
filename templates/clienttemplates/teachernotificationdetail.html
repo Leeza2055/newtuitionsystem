@@ -1,0 +1,49 @@
+{% extends "clienttemplates/teacherbase.html" %}
+{% load static %}
+{% block content %}
+<h1>
+Hired By:{{teachernotificationdetail.student}}</h1>
+<p>Course: {{teachernotificationdetail.student.course}}</p>
+<p>Subject : {{teachernotificationdetail.student.subject}}<p>
+<p>Location : {{teachernotificationdetail.student.address}}</p>
+{% if not  teachernotificationdetail.accept %}
+<button class="btn btn-success accept_request">Accept the request</button>
+{% else %}
+<button class="btn btn-danger reject_request">Reject the request</button>
+{% endif %}
+
+{% endblock %}
+
+{% block js %}
+<script type="text/javascript">
+	$('.accept_request').on('click', function(e){
+		e.preventDefault();
+		$.ajax({
+			url: "{% url 'hometuitionapp:ajaxacceptrequest' %}",
+			data: {
+				'hiring_id': "{{teachernotificationdetail.id}}",
+			},
+			success: function(data){
+				alert("Accepted Success")
+			}
+		})
+	})
+</script>
+
+<script type="text/javascript">
+	$('.reject_request').on('click', function(e){
+		e.preventDefault();
+		$.ajax({
+			url: "{% url 'hometuitionapp:ajaxrejectrequest' %}",
+			data: {
+				'hiring_id': "{{teachernotificationdetail.id}}",
+			},
+			success:function(data){
+				alert("Rejected request")
+			}			
+		})
+	})
+</script>
+{% endblock %}
+
+

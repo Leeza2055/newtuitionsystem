@@ -1,0 +1,10 @@
+{% extends "clienttemplates/studentbase.html" %}
+{% block content %}
+<h4>Update Form</h4>
+<form enctype="multipart/form-data" method="POST">
+	{% csrf_token %}
+	{{form.as_p}}
+	{{error}}
+	<button>Submit</button>	
+</form>
+{% endblock %}
