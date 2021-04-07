@@ -11,8 +11,11 @@
 <p>Experience:{{teacherdetail.experience}}</p>
 <p>CV:{{teacherdetail.cv}}</p>
 <p>Citizenship:{{teacherdetail.citizenship}}</p>
-<p>Course:{{teacherdetail.course}}</p>
-<p>Subject:{{teacherdetail.subject}}</p>
+<!-- <p>Course:{{teacherdetail.course}}</p> -->
+
+<p>Course:{% for c in teacherdetail.course.all %}{{c.name}}{% endfor %}</p>
+
+<p>Subject:{% for s in teacherdetail.subject.all %}{{s.name}}{% endfor %}</p>
 <div class="mb-3">
 
     <a class="btn btn-primary" style="width: 25%;" href="{% url 'hometuitionapp:teacherupdate' request.user.teacher.id %}">Update</a>

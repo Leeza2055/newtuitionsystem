@@ -1,0 +1,23 @@
+{% extends "clienttemplates/teacherbase.html" %}
+{% load static %}
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="outer-w3-agile col-xl mt-3 mr-xl-3">
+            <h4 class="tittle-w3-agileits mb-4">Subject Fee Form</h4>
+            <form id="form1" method="post" class="mb-5">
+                {% csrf_token %}
+                <!-- <input type="hidden" value="{{request.user}}"> -->
+                Teacher: {{form.teacher}}
+                Course:{{form.course}}
+                Subject :{{form.subject}}
+                Amount:{{form.amount}}
+                {{form.error}}
+                <button type="submit" id="btnSubmit">Submit</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+{% endblock %}

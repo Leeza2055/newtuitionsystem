@@ -3,7 +3,7 @@
 <html lang="en">
 
 <head>
-    <title>Modernize an Admin Panel Category Bootstrap Responsive Web Template | Home :: w3layouts</title>
+    <title>Home Tuition System Admin Panel | {% block title %}{% endblock %}</title>
     <!-- Meta Tags -->
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta charset="utf-8">
@@ -45,8 +45,40 @@ Smartphone Compatible web template, free webdesigns for Nokia, Samsung, LG, Sony
     <link href="//fonts.googleapis.com/css?family=Poiret+One" rel="stylesheet">
     <link href="//fonts.googleapis.com/css?family=Open+Sans:300,400,600,700" rel="stylesheet">
     <!--//web-fonts-->
-    {% block css %}
-    {% endblock %}
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link href="https://fonts.googleapis.com/css?family=Nunito:300,400,400i,600,700,800,900" rel="stylesheet" />
+    <link href="{% static 'operatorstatic/css/themes/lite-purple.min.css' %}" rel="stylesheet" />
+    <link href="{% static 'operatorstatic/css/plugins/perfect-scrollbar.min.css' %}" rel="stylesheet" />
+    <link rel="stylesheet" href="{% static 'operatorstatic/css/plugins/toastr.css' %}" />
+    <link rel="stylesheet" href="{% static 'operatorstatic/css/plugins/dropzone.min.css' %}" />
+    
+    <style>
+        a.del-icon:hover, a.del-icon:focus{
+            cursor: pointer;
+        }
+        .image-pointer:hover {
+            cursor: pointer;
+        }
+        .red-note{
+            color: red;
+            font-weight: bold;
+            font-size: small;
+        }
+        .green-note{
+            color: green;
+        }
+        .reload-page:hover{
+            cursor: pointer;
+        }
+        .hover-black:hover{
+            background-color: black;
+            color: white;
+        }
+        </style>
+        {% block css %}
+    
+        {% endblock %}
+    
 </head>
 
 <body>
@@ -134,6 +166,32 @@ Smartphone Compatible web template, free webdesigns for Nokia, Samsung, LG, Sony
                     <ul class="collapse list-unstyled" id="hire">
                         <li>
                             <a href="{% url 'hometuitionapp:adminhirelist' %}">Hire List</a>
+                        </li>
+                          
+                    </ul>
+                </li>
+                <li>
+                    <a href="#slider" data-toggle="collapse" aria-expanded="false">
+                        <i class="fas fa-laptop"></i>
+                        Slider
+                        <i class="fas fa-angle-down fa-pull-right"></i>
+                    </a>
+                    <ul class="collapse list-unstyled" id="slider">
+                        <li>
+                            <a href="{% url 'hometuitionapp:adminsliderlist' %}">Slider List</a>
+                        </li>
+                          
+                    </ul>
+                </li>
+                <li>
+                    <a href="#ticket" data-toggle="collapse" aria-expanded="false">
+                        <i class="fas fa-laptop"></i>
+                        Ticket
+                        <i class="fas fa-angle-down fa-pull-right"></i>
+                    </a>
+                    <ul class="collapse list-unstyled" id="ticket">
+                        <li>
+                            <a href="{% url 'hometuitionapp:adminticketlist' %}">Raised Ticket List</a>
                         </li>
                           
                     </ul>
@@ -635,6 +693,84 @@ Smartphone Compatible web template, free webdesigns for Nokia, Samsung, LG, Sony
     <!-- Js for bootstrap working-->
     <script src="{% static 'adminstatic/js/bootstrap.min.js' %}"></script>
     <!-- //Js for bootstrap working -->
+    <div id="delete-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true" style="display: none;">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				
+			</div>
+			<!-- /.modal-content -->
+		</div>
+		<!-- /.modal-dialog -->
+    </div>
+    <div id="detail-modal" class="modal fade bd-example-modal-lg" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true" style="display: none;">
+		<div class="modal-dialog modal-lg">
+			<div class="modal-content">
+				
+			</div>
+			<!-- /.modal-content -->
+		</div>
+		<!-- /.modal-dialog -->
+    </div>
+   <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+   <script src="{% static 'operatorstatic/js/plugins/jquery-3.3.1.min.js' %}"></script>
+    <script src="{% static 'operatorstatic/js/plugins/bootstrap.bundle.min.js' %}"></script>
+    <script src="{% static 'operatorstatic/js/plugins/perfect-scrollbar.min.js' %}"></script>
+    <script src="{% static 'operatorstatic/js/scripts/script.min.js' %}"></script>
+    <script src="{% static 'operatorstatic/js/scripts/sidebar.large.script.min.js' %}"></script>
+    <script src="{% static 'operatorstatic/js/plugins/echarts.min.js' %}"></script>
+    <script src="{% static 'operatorstatic/js/scripts/echart.options.min.js' %}"></script>
+    <script src="{% static 'operatorstatic/js/scripts/dashboard.v1.script.min.js' %}"></script>
+    <script src="{% static 'operatorstatic/js/plugins/toastr.min.js' %}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="{% static 'operatorstatic/js/plugins/dropzone.min.js' %}"></script>
+    <script src="{% static 'operatorstatic/js/scripts/dropzone.script.min.js' %}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+
+    <script type="text/javascript">
+        $('#main-modal').on('show.bs.modal', function (e) {
+            var button = $(e.relatedTarget);
+            var modal = $(this);
+            modal.find('.modal-content').load(button.data("remote"));
+        });
+        $('#main-modal').on('hidden.bs.modal', function (e) {
+            var button = $(e.relatedTarget);
+            var modal = $(this);
+            modal.find('.modal-content').empty();
+        });
+    </script>
+    {% block js %}
+
+    {% endblock %}
+    <script>
+        {% if messages %}
+        {% for message in messages %}
+        $(document).ready(function () {
+            {% if message.tags == "alert-success" %}
+            toastr.success("{{message}}", "Success", {
+                timeOut: "3000"
+            });
+            {% else %}
+            toastr.error("{{message}}", "Error", {
+                timeOut: "3000"
+            });
+            {% endif %}
+        })
+        {% endfor %}
+        {% endif %}
+    </script>
+
+<script type="text/javascript">
+    $('#delete-modal, #detail-modal').on('show.bs.modal', function(e){
+        var button = $(e.relatedTarget);
+        var modal = $(this);
+        modal.find('.modal-content').load(button.data("remote"));
+    });
+</script>
+    
+    
+    
+
 
 </body>
 

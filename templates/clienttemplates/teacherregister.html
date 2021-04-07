@@ -12,6 +12,7 @@
 	{% csrf_token %}
 		<div class="row">
 			<div class="col-md-6 col-sm-6 form-group">
+				{{form.errors}}
 				<label class="col-form-label">Username</label>
 				<!-- <input type="text" class="form-control" name="username" placeholder="" required=""> -->{{form.username}}
 				{{form.username.errors}}
@@ -102,31 +103,27 @@
 		</div> 
 		{%	endfor	%} -->
 		<div class="row">
-			<div class="col-md-6 col-sm-6 form-group">
-				<label class="col-form-label">Course</label>
-				{% for item in form.course %}
-                    <li><input type="checkbox", value="clicked", name="c{{item.id}}">{{item}}</li>
-            	{% endfor %}
+			<div class="col-md-12 col-sm-12 form-group">
+				<div class="col-md-12">
+					<label class="col-form-label">Course</label>
+				</div>
+				{% for c in course %}
+					<div class="col-md-4">
+						
+						<button type="button" class="btn btn-primary" data-toggle="collapse" data-target="#demo__{{c.id}}">{{c.name}}</button>
+						<div id="demo__{{c.id}}" class="collapse">
+							{% for s in c.subject_set.all %}
+							<label>{{s.name}}</label>
+							<input type="checkbox" name="subject__{{s.id}}">
+							{% endfor %}
+						</div>
+					</div>
+				{% endfor %}
 			</div>
-			<div class="col-md-6 col-sm-6 form-group">
-				<label class="col-form-label">Subject</label>
-				{% for item in form.subject %}
-                    <li><input type="checkbox", value="clicked", name="c{{item.id}}">{{item}}</li>
-            	{% endfor %}
-			</div>
+			
 		</div>
-		<div class="row">
-			<div class="col-md-6 col-sm-6 form-group">
-				<label class="col-form-label">Education</label>
-				<!-- <input type="text" class="form-control" name="education" placeholder="" required=""> -->
-				{{form.education}}
-			</div>
-			<div class="col-md-6 col-sm-6 form-group">
-				<label class="col-form-label">Experience</label>
-				<!-- <input type="text" class="form-control" name="experience" placeholder="" required=""> -->
-				{{form.teaching_experience}}
-			</div>
-		</div>
+		
+		
 		<div class="row">
 			<div class="col-md-6 col-sm-6 form-group">
 				<label class="col-form-label">CV</label>
@@ -134,9 +131,11 @@
 				{{form.cv}}
 			</div>
 			<div class="col-md-6 col-sm-6 form-group">
-				<label class="col-form-label">Monthly Fee</label>
-				{{form.monthly_fee}}
+				<label class="col-form-label">Education</label>
+				<!-- <input type="text" class="form-control" name="education" placeholder="" required=""> -->
+				{{form.education}}
 			</div>
+			
 		</div>
 		<div class="row">
 			<div class="col-md-6 col-sm-6 form-group">
@@ -154,7 +153,7 @@
 				{{form.training_license}}
 			</div>
 			<div class="col-md-6 col-sm-6 form-group">
-				<label class="col-form-label">Availability</label>
+				<label class="col-form-label">Availability Time</label>
 				{{form.availabilty}}
 			</div>
 		</div>

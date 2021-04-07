@@ -11,7 +11,6 @@
 <form action="" enctype="multipart/form-data" method="post">
 	{% csrf_token %}
 
-
 	
 		<div class="row">
 			<div class="col-md-6 col-sm-6 form-group">
@@ -64,21 +63,39 @@
 		</div>
 		<div class="row">
 			<div class="col-md-6 col-sm-6 form-group">
-				<label class="col-form-label">Course</label>
-				<!-- <select class="form-control" name="course" id="" required>
-					<option value="------"></option> -->
-					{{form.course}}
-				<!-- </select> -->
+				<div class="col-md-12">
+					<label class="col-form-label">Course</label>
+				</div>
+				
+				{% for c in course %}
+				<div class="col-md-4">
+					
+					<button type="button" class="btn btn-primary" data-toggle="collapse" data-target="#demo__{{c.id}}">{{c.name}}</button>
+					<div id="demo__{{c.id}}" class="collapse">
+						{% for s in c.subject_set.all %}
+							<label>{{s.name}}</label>
+							<input type="checkbox" name="subject__{{s.id}}">
+						{% endfor %}
+					</div>
+				</div>
+				{% endfor %}
 			</div>
 			<div class="col-md-6 col-sm-6 form-group">
-				<label class="col-form-label">Subject</label>
-				<!-- <select class="form-control" name="subject" id="" required>
-					<option value="------"></option>
-					
-				</select> -->
-				{{form.subject}}
+				<label class="col-form-label">Tuition Type</label>
+				<!-- <input type="text" class="form-control" name="address" placeholder="" required=""> -->{{form.tuition_type}}
 			</div>
 		</div>
+		<div class="row">
+			<div class="col-md-6 col-sm-6 form-group">
+				<label class="col-form-label">Salary</label>
+				<!-- <input type="text" class="form-control" name="address" placeholder="" required=""> -->{{form.salary}}
+			</div>
+			<div class="col-md-6 col-sm-6 form-group">
+				<label class="col-form-label">Availability Time</label>
+				<!-- <input type="file" class="form-control-file" name="reportCard" placeholder="" required=""> -->{{form.time}}
+			</div>
+		</div>
+
 		<!-- {%	for	field	in	form	%}
 		<div>				
 			{{	field.errors	}}		

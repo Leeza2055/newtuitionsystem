@@ -1,0 +1,91 @@
+{% extends 'admintemplates/base.html' %}
+{% load static %}
+
+{% block title %}
+    {% if update %}Update Slider{% else %}Add New Slider{% endif %} 
+{% endblock %}
+{% block css %}
+<link href="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/css/select2.min.css" rel="stylesheet" />
+<link rel="stylesheet" href="{% static 'operatorstatic/css/plugins/ladda-themeless.min.css' %}" />
+
+<style>
+    .errorlist,
+    .required {
+        color: red;
+    }
+
+    .required {
+        font-size: 15px;
+    }
+
+    .select2 {
+        width: 100% !important;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="breadcrumb">
+    <ul>
+        <li><a href="{% url 'hometuitionapp:adminhome' %}">Dashboard</a></li>
+        <li><a href="{% url 'hometuitionapp:adminsliderlist' %}">All Sliders</a></li>
+        <li>
+            {% if update %}Update Slider{% else %}Add New Slider{% endif %} 
+        </li>
+    </ul>
+</div>
+<div class="separator-breadcrumb border-top"></div>
+<form method="POST" enctype="multipart/form-data" id="slider_create_update">
+    {% csrf_token %}
+    <div class="row">
+        <div class="col-md-12">
+            {{form.non_field_errors}}
+            <div class="card mb-4">
+                <div class="card-body">
+                    <div class="card-title mb-3">Slider Informations</div><hr>
+                    <div class="row">
+                        <div class="col-md-6 form-group mb-3">
+                            <label for="id_title">Title</label>
+                            {{form.title}}
+                            <!-- {{form.title.errors}} -->
+                        </div>
+                        
+                        <div class="col-md-12 form-group mb-3">
+                            <label for="id_caption">Content</label>
+                            {{form.content}}
+                            <!-- {{form.caption.errors}} -->
+                        </div>
+                        <div class="col-md-6 form-group mb-3">
+                            <label for="id_image">image</label>
+                            {{form.image}}
+                            <!-- {{form.image.errors}} -->
+                        </div>
+                        <div class="col-md-12 form-group mb-3">
+                            <label for="id_status">status</label>
+                            {{form.status}}
+                            <!-- {{form.status.errors}} -->
+                        </div>
+                    </div>
+                    <hr>
+                    <button class="btn btn-info submitted_button">Save Slider</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+{% endblock %}
+
+{% block js %}
+<script src="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/js/select2.min.js"></script>
+<script src=" {% static 'operatorstatic/js/plugins/spin.min.js' %} "></script>
+<script src=" {% static 'operatorstatic/js/plugins/ladda.min.js' %} "></script>
+<script src=" {% static 'operatorstatic/js/scripts/ladda.script.min.js' %} "></script>
+<script type="text/javascript">
+    $('.submitted_button').on('click', function(e) {
+        var laddaBtn = e.currentTarget;
+        var l = Ladda.create(laddaBtn);
+        l.start();
+        document.getElementById("slider_create_update").submit();
+    })
+</script>
+{% endblock %}

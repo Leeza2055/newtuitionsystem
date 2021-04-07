@@ -1,0 +1,14 @@
+<div class="modal-header">
+    <h4>Delete</h4>
+	<button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+</div>
+<form method="POST" action="{% url 'hometuitionapp:adminsliderdelete' object.id %}">
+	{% csrf_token %}
+	<div class="modal-body">
+		<h5 class="mb-15">Are you sure you want to delete '{{object.title}}'?</h5>
+	</div>
+	<div class="modal-footer">
+		<button class="btn btn-danger text-left">Confirm</button>
+		<button type="button" class="btn btn-default text-left" data-dismiss="modal">Close</button>
+	</div>
+</form>

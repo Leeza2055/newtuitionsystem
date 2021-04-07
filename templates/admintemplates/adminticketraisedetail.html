@@ -1,0 +1,205 @@
+{% extends 'admintemplates/base.html' %}
+{% load static %}
+
+{% block css %}
+
+{% endblock %}
+{% block content %}
+
+<div class="page-wrapper">
+	<div class="container-fluid">
+		
+		<!-- Title -->
+		<div class="row heading-bg">
+			<div class="col-lg-3 col-md-4 col-sm-4 col-xs-12">
+			  <h5 class="txt-dark">Ticket Raise #{{ticketraisedetail.id}}</h5>
+			</div>
+			<!-- Breadcrumb -->
+			<div class="col-lg-9 col-sm-8 col-md-8 col-xs-12">
+			  <ol class="breadcrumb">
+				<li><a href="{% url 'hometuitionapp:adminhome' %}">Home</a></li>
+				<li class="active"><span>Ticket Raise #{{ticketraisedetail.id}}</span></li>
+			  </ol>
+			</div>
+			<!-- /Breadcrumb -->
+		</div>
+		<!-- /Title -->
+		<!-- Row -->
+		<div class="row">
+			<div class="col-sm-12 col-md-4">
+				<div class="panel panel-default card-view">
+					<div class="panel-heading">
+						<div class="row">
+							<div class="col-sm-12 col-md-12">
+								<h5 class="txt-dark">Ticket Information: <span>#Ticket{{ticketraisedetail.id}}</span></h5>
+								<p>Request By: <span style="font-weight: bold;">{{ticketraisedetail.sender}}</span></p>
+								<p>Issue Type: <span style="font-weight: bold;">{{ticketraisedetail.issue_type}}</span></p>
+								<p>Submitted: <span style="font-weight: bold;">{{ticketraisedetail.created_at|date}}</span></p>
+								<p>Last Update: <span style="font-weight: bold;">{{ticketraisedetail.updated_at|date}}</span></p>
+								<p>
+									Status: {% if ticketraisedetail.issue_solved %} <span class="label label-success" style="font-weight: bold;"> Solved {% else %} <span class="label label-danger" style="font-weight: bold;"> Not Solved {% endif %} </span>
+								</p>
+								<hr>
+								{% if not ticketraisedetail.issue_solved %}
+								<button class="btn btn-success ticketraisestatus" data-href="{% url 'hometuitionapp:ajaxticketraisestatus' %}"  data-ticket-id="{{ticketraisedetail.id}}">Solved</button>
+								{% endif %}
+							</div>
+							<div class="col-sm-12 col-md-12">
+								<h5 class="txt-dark">Ticket Raised Reason:</h5>
+								<p>{{ticketraisedetail.issue}}</p>
+							</div>
+						</div>
+						<div class="clearfix"></div>
+					</div>
+				</div>	
+			</div>
+			<div class="col-sm-12 col-md-8">
+				<div class="panel panel-default card-view">
+					<div class="panel-heading">
+						<div class="row">
+							<div class="recent-chat-box-wrap">
+								<div class="recent-chat-wrap">
+									<div class="panel-heading ma-0 pt-15 text-center">
+										<span class="inline-block txt-dark" style="font-size: 18px;">MESSAGES</span>
+									</div>
+                                    <div id="ajaxticketraiseremark">
+                                        <div class="chat-content">
+                                            <ul class="chatapp-chat-nicescroll-bar pt-20">
+                                                {% for remark in ticketraisedetail.ticketraiseremark_set.all|dictsort:"created_at" %}
+                                                {% if remark.is_problem_solver %}
+                                                <li class="self mb-10">
+                                                    <div class="self-msg-wrap">
+                                                        <div class="msg block pull-right"> {{remark.issue_remark|striptags|safe}}
+                                                            <div class="msg-per-detail text-right">
+                                                                <span class="msg-time txt-grey">{{remark.created_at}}</span> <span class="msg-time txt-grey">({{remark.created_at|timesince}} ago)</span>
+                                                            </div>
+                                                        </div>
+                                                        <div class="clearfix"></div>
+                                                    </div>	
+                                                </li>
+                                                {% else %}
+                                                <li class="friend">
+                                                    <div class="friend-msg-wrap">
+                                                        <div class="msg pull-left">
+                                                            <p>{{remark.issue_remark|striptags|safe}}</p>
+                                                            <div class="msg-per-detail text-right">
+                                                                <span class="msg-time txt-grey">{{remark.created_at}}</span> <span class="msg-time txt-grey">({{remark.created_at|timesince}} ago)</span>
+                                                            </div>
+                                                        </div>
+                                                        <div class="clearfix"></div>
+                                                    </div>	
+                                                </li>
+                                                {% endif %}
+                                                {% endfor %}
+                                            </ul>
+                                        </div>
+                                        
+                                    </div>
+                                    {% if not ticketraisedetail.issue_solved %}
+                                    <div class="row" style="margin: 10px;">
+                                        <form>
+                                            <div class="col-md-10">
+                                                {{ticketraiseremarkform.issue_remark}}
+                                            </div>
+                                            <div class="col-md-2">
+                                                <button class="btn btn-success mt-10 remarksubmit"><i class="fa fa-paper-plane" aria-hidden="true"></i></button>
+                                            </div>
+                                        </form> 
+                                    </div>
+                                    {% endif %}
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>	
+			</div>
+		</div>
+		<!-- /Row -->
+	</div>
+	
+	
+	
+</div>
+
+{% endblock %}
+
+{% block js %}
+
+
+
+
+
+<script type="text/javascript">
+    $('.remarksubmit').on('click', function(e){
+        e.preventDefault();
+        var text = $('#id_issue_remark').val();
+        if(text != ""){
+            $.ajax({
+                url: "{% url 'hometuitionapp:ajaxticketraiseremarkview' ticketraisedetail.id %}",
+                data: {
+                    'text': text,
+                    'request_from': 'hometuitionsystem',
+                },
+                success: function(data){
+                	// alert("success")
+                	$('#id_issue_remark').val("");
+                	$('#ajaxticketraiseremark').html(data);
+                    // $('.close').click()
+                    // $.toast({
+                    //     heading: 'Remark Added',
+                    //     text: 'Remark Added Successfully!!!',
+                    //     position: 'top-right',
+                    //     loaderBg:'#f0c541',
+                    //     icon: 'success',
+                    //     hideAfter: 3500, 
+                    //     stack: 6
+                    // });
+                }
+            })
+        }
+        else {
+            $.toast({
+                heading: 'Empty field',
+                text: 'Please Write Your Message',
+                position: 'top-right',
+                loaderBg:'#f0c541',
+                icon: 'error',
+                hideAfter: 3500, 
+                stack: 6
+            });
+        }
+    })
+</script>
+
+
+
+ <script type="text/javascript">
+	$('.ticketraisestatus').on('click', function(e){
+		// var status = $(this).attr('checked')
+		// alert($(this).val())
+		e.preventDefault();
+		$this = $(this);
+		$.ajax({
+			url: $this.attr('data-href'),
+			data: {
+				'id' : $this.attr('data-ticket-id'),
+			},
+			success: function(data){
+				if (data.message=='Error'){
+					
+			        location.reload()
+				}
+				else{
+					
+			        location.reload()
+				}
+		        // $('#admin_featured_products').load(' #admin_featured_products');
+				},
+			error: function(data){
+
+			}
+		});
+	});
+</script>  -->
+
+{% endblock %}

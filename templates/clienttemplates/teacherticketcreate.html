@@ -1,0 +1,75 @@
+{% extends 'clienttemplates/teacherbase.html' %}
+
+
+{% load static %}
+
+{% block content %}
+
+<div class="page-wrapper">
+	<div class="container-fluid">
+		<!-- Title -->
+		<div class="row heading-bg">
+			<div class="col-lg-3 col-md-4 col-sm-4 col-xs-12">
+			  <h5 class="txt-dark">Open Ticket</h5>
+			</div>
+			<!-- Breadcrumb -->
+			<div class="col-lg-9 col-sm-8 col-md-8 col-xs-12">
+			  <ol class="breadcrumb">
+				<li><a href="{% url 'hometuitionapp:teacherhome' %}">Home</a></li>
+				<li class="active"><span>Ticket Create</span></li>
+			  </ol>
+			</div>
+			<!-- /Breadcrumb -->
+		</div>
+		<!-- /Title -->
+		
+		<!-- Row -->
+		<div class="row">
+			<div class="col-sm-12">
+				<div class="panel panel-default card-view">
+					<div class="panel-wrapper collapse in">
+						<div class="panel-body">
+							<div class="form-wrap">
+								<form method="POST" enctype="multipart/form-data">
+									{% csrf_token %}
+									<div class="row">
+										<div class="col-md-12">
+											<div class="row">
+                                                
+												
+                                                
+												
+												<div class="col-xs-6 col-sm-6">
+													<div class="form-group">
+                                                        <label class="control-label mb-10">Issue Related To</label>
+                                                        <br>
+                                                        <label class="control-label mb-10" style="font-size: 10px;">Select According to Issue you are facing</label>
+														{{form.issue_type}}
+													</div>
+                                                </div>
+                                                <div class="col-xs-12 col-sm-12">
+													<div class="form-group">
+                                                        <label class="control-label mb-10">Your Issue</label>
+														{{form.issue}}
+													</div>
+												</div>
+											</div>
+										</div>
+									</div>
+									<div class="row">
+										<div class="form-actions">
+											<button class="btn btn-success btn-icon left-icon ml-15 mr-15"> <i class="fa fa-check"></i> <span>Raise Ticket</span></button>
+											<!-- <button 	type="reset" class="btn btn-warning">Reset</button> -->
+											<div class="clearfix"></div>
+										</div>
+									</div>
+								</form>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<!-- /Row -->
+	</div>
+{% endblock %}

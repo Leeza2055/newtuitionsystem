@@ -1,0 +1,93 @@
+{% if request_from == 'teacher' %}
+
+            {% for remark in ticketraisedetail.ticketraiseremark_set.all|dictsort:"created_at" %}
+            {% if remark.is_problem_solver %}
+            <div class="d-flex justify-content-start mb-4">
+                <!-- <div class="img_cont_msg">
+                    <img src="" style="object-fit: cover;" class="rounded-circle user_img_msg">
+                </div> -->
+                <div class="msg_cotainer">
+                    {{remark.issue_remark|striptags|safe}}
+                    <span class="msg_time text-dark">{{remark.created_at|timesince}}</span>
+                </div>
+            </div>
+            {% else %}
+            <div class="d-flex justify-content-end mb-4">
+                <div class="msg_cotainer_send">
+                    {{remark.issue_remark|striptags|safe}}
+                    <span class="msg_time_send text-dark">{{remark.created_at|timesince}}</span>
+                </div>
+                <div class="img_cont_msg">
+                    <img src="" alt="No Image" class="rounded-circle user_img_msg">
+                </div>
+            </div>
+            {% endif %}
+            {% endfor %}
+            
+
+{% elif request_from == 'student' %}
+<div class="chat-content">
+	<ul class="chatapp-chat-nicescroll-bar pt-20">
+		{% for remark in ticketraisedetail.ticketraiseremark_set.all|dictsort:"created_at" %}
+		{% if remark.is_problem_solver %}
+		<li class="friend">
+			<div class="friend-msg-wrap">
+				<div class="msg pull-left">
+					<p>{{remark.issue_remark|striptags|safe}}</p>
+					<div class="msg-per-detail text-right">
+						<span class="msg-time txt-grey">{{remark.created_at|timesince}} ago</span>
+					</div>
+				</div>
+				<div class="clearfix"></div>
+			</div>	
+		</li>
+		{% else %}
+		<li class="self mb-10">
+			<div class="self-msg-wrap">
+				<div class="msg block pull-right"> {{remark.issue_remark|striptags|safe}}
+					<div class="msg-per-detail text-right">
+						<span class="msg-time txt-grey">{{remark.created_at|timesince}} ago</span>
+					</div>
+				</div>
+				<div class="clearfix"></div>
+			</div>	
+		</li>
+		{% endif %}
+		{% endfor %}
+	</ul>
+</div>
+
+{% else %}
+
+<div class="chat-content">
+    <ul class="chatapp-chat-nicescroll-bar pt-20">
+        {% for remark in ticketraisedetail.ticketraiseremark_set.all|dictsort:"created_at" %}
+        {% if remark.is_problem_solver %}
+        <li class="self mb-10">
+            <div class="self-msg-wrap">
+                <div class="msg block pull-right"> {{remark.issue_remark|striptags|safe}}
+                    <div class="msg-per-detail text-right">
+                        <span class="msg-time txt-grey">{{remark.created_at|timesince}} ago</span>
+                    </div>
+                </div>
+                <div class="clearfix"></div>
+            </div>  
+        </li>
+        {% else %}
+        <li class="friend">
+            <div class="friend-msg-wrap">
+                <div class="msg pull-left">
+                    <p>{{remark.issue_remark|striptags|safe}}</p>
+                    <div class="msg-per-detail text-right">
+                        <span class="msg-time txt-grey">{{remark.created_at|timesince}} ago</span>
+                    </div>
+                </div>
+                <div class="clearfix"></div>
+            </div>  
+        </li>
+        {% endif %}
+        {% endfor %}
+    </ul>
+</div>
+
+{% endif %}

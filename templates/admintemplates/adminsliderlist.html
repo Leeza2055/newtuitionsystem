@@ -1,0 +1,232 @@
+{% extends 'admintemplates/base.html' %}
+{% load static %}
+
+{% block title %}{% if request.GET.status %}{{request.GET.status|capfirst}}{% else %}All{% endif %}Slider List{% endblock %}
+
+{% block css %}
+<link rel="stylesheet" href="{% static 'operatorstatic/css/plugins/datatables.min.css' %}" />
+<style>
+.image-size{
+    height: 150px;
+    width: 150px;
+    left: 200px;
+    object-fit: contain;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="breadcrumb">
+    <ul>
+        <li><a title="Click Here to go in Dashboard." href="{% url 'hometuitionapp:adminhome' %}">Dashboard</a></li>
+        <li><a class="reload-page" title="Click Here to Reload this page." onclick="document.location.reload(true)">Slider List</a></li>
+    </ul>
+</div>
+<div class="separator-breadcrumb border-top"></div>
+<div id="counting">
+<div class="row mb-4">
+    <div class="col-md-2">
+        <div class="card card-icon mb-4" style="background-color: rgb(21, 95, 179);">
+            <a href="?status=all">
+                <div class="card-body text-center" title="Total number of sliders that you have: {{allcount}}.">
+                    <p class="text-white mt-2 mb-2">All Sliders</p>
+                    <p class="lead text-white text-22 m-0">{{allcount}}</p>
+                </div>
+            </a>
+        </div>
+    </div>
+    <div class="col-md-2">
+        <div class="card card-icon mb-4" style="background-color: rgb(15, 189, 73);">
+            <a href="?status=Active">
+                <div class="card-body text-center" title="Total number of active slider: {{active}}.">
+                    <p class="text-white mt-2 mb-2">Active Sliders</p>
+                    <p class="lead text-white text-22 m-0">{{active}}</p>
+                </div>
+            </a>
+        </div>
+    </div>
+    <div class="col-md-2">
+        <div class="card card-icon mb-4" style="background-color: rgb(192, 202, 11);">
+            <a href="?status=Inactive">
+                <div class="card-body text-center" title="Total number of inactive sliders: {{inactive}}.">
+                    <p class="text-white mt-2 mb-2">Inactive Sliders</p>
+                    <p class="lead text-white text-22 m-0">{{inactive}}</p>
+                </div>
+            </a>
+        </div>
+    </div>
+    <div class="col-md-2">
+        <div class="card card-icon mb-4" style="background-color: rgb(202, 11, 11);">
+            <a href="?status=Disabled">
+                <div class="card-body text-center" title="Total number of disabled sliders: {{inactive}}.">
+                    <p class="text-white mt-2 mb-2">Disabled Sliders</p>
+                    <p class="lead text-white text-22 m-0">{{disabled}}</p>
+                </div>
+            </a>
+        </div>
+    </div>
+</div>
+</div>
+<div class="row mb-4">
+    <div class="col-md-12 mb-4">
+        <div class="card text-left">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-8">
+                        <h4 class="card-title mb-3"><a title="Click here to load Slider List Page." href="{% url 'hometuitionapp:adminsliderlist' %}"> {% if request.GET.status %}{{request.GET.status|capfirst}}{% else %}All{% endif %}
+                                Sliders</a></h4>
+                        <p>Here you can manage all Sliders. <span class="green-note">(Hover Slider Title to view Slider Image.)</span> </p>
+                        <!-- <select name="" id="paginate_by">
+                            <option value="25">25</option>
+                            <option value="50">50</option>
+                            <option value="100">100</option>
+                            <option value="all">all</option>
+                        </select> -->
+                    </div>
+                    <div class="col-md-4">
+                        <p>
+                            <input type="search" name="search" class="form-control" id="b-search"
+                                placeholder="Type any keyword and press Enter." value="{{request.GET.keyword}}">
+                        </p>
+                        <br>
+                        <p>
+                            <a title="Add Slider" href="{% url 'hometuitionapp:adminslidercreate' %}"
+                                style="font-size: 40px;position: absolute; top: 30px; right: 50px;"><span
+                                    class="nav-icon i-Add"></span></a>
+                        </p>
+                    </div>
+                </div>
+                <div class="table-responsive mt-2">
+                    <table class="display table table-striped table-bordered"
+                        style="width:100%">
+                        <thead>
+                            <tr style="background-color: black; color: white;">
+                                <th>SN</th>
+                                <th>Title</th>
+                                <th>Created At</th>
+                                <th>Status</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for slider in all_sliders %}
+                            <tr>
+                                <th>{{forloop.counter}}</th>
+                                <th>
+                                    <!-- <a class="image-pointer" rel="popover" data-img="{{slider.image.url}}"> -->
+                                        {{slider.title}} 
+                                    <!-- </a> -->
+                                </th>
+                                <th>{{slider.created_at}} </th>
+                                <th>
+                                    <label class="switch pr-5 switch-success mr-3" title="Click to change status of {{slider.title}}."><span class="slider-label">{{slider.status}}</span>
+                                        <input type="checkbox" data-id="{{slider.id}}" data-title="{{slider.title}}" class="sliderstatus" data-href="" {% if slider.status == "Active" %}checked="checked"{% endif %} /><span class="slider"></span>
+                                    </label>
+                                </th>
+                                <th>
+                                    <a data-toggle="modal" title="View Detail {{slider.title}}" data-target="#detail-modal" data-remote="{% url 'hometuitionapp:adminsliderdetail' slider.id %}" class="btn btn-primary m-1 del-icon text-white">Detail</a>
+                                    <a href="{% url 'hometuitionapp:adminsliderupdate' slider.id %}" class="btn btn-warning" title="Update {{slider.title}} Info">Update</a>
+                                    <a data-toggle="modal" title="Delete {{slider.title}}" data-target="#delete-modal" data-remote="{% url 'hometuitionapp:adminsliderdelete' slider.id %}" class="btn btn-danger m-1 del-icon">Delete</a>
+                                </th>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block js %}
+<script src="{% static 'operatorstatic/js/plugins/datatables.min.js' %}"></script>
+<script src="{% static 'operatorstatic/js/scripts/datatables.script.min.js' %}"></script>
+<script type="text/javascript">
+	$('a[rel=popover]').popover({
+	html: true,
+	trigger: 'hover',
+	placement: 'right',
+	content: function(){
+		return '<img class="image-size" src="'+$(this).data('img') + '" />';
+	}
+	});
+</script>
+<script type="text/javascript">
+    $('body').on('click', '.sliderstatus', function(e){
+      e.preventDefault();
+      $this = $(this);
+      var title = $this.attr('data-title');
+      var btn = $('.sliderstatus')
+      $(".sliderstatus").prop('disabled', true);
+      $.ajax({
+        method: 'post',
+        data: {
+            'slider_id': $this.attr('data-id'),
+            'csrfmiddlewaretoken': "{{csrf_token}}",
+        },
+        success: function(data){
+          $this.prop('checked', !$this.prop('checked'));
+          if ($this.is(':checked')){
+            $this.parent().find('.slider-label').text('Active');
+            toastr.success(`${title} Status Changed to Active`, 'Successful')
+            toastr.options = {
+                "closeButton": true,
+                "debug": false,
+                "newestOnTop": false,
+                "progressBar": false,
+                "positionClass": "toast-top-right",
+                "preventDuplicates": false,
+                "onclick": null,
+                "showDuration": "300",
+                "hideDuration": "1000",
+                "timeOut": "5000",
+                "extendedTimeOut": "1000",
+                "showEasing": "swing",
+                "hideEasing": "linear",
+                "showMethod": "fadeIn",
+                "hideMethod": "fadeOut"
+            }
+          } else {
+            $this.parent().find('.slider-label').text('Disabled');
+            toastr.warning(`${title} Status Changed to Disabled`, 'Successful')
+            toastr.options = {
+                "closeButton": true,
+                "debug": false,
+                "newestOnTop": false,
+                "progressBar": false,
+                "positionClass": "toast-top-right",
+                "preventDuplicates": false,
+                "onclick": null,
+                "showDuration": "300",
+                "hideDuration": "1000",
+                "timeOut": "5000",
+                "extendedTimeOut": "1000",
+                "showEasing": "swing",
+                "hideEasing": "linear",
+                "showMethod": "fadeIn",
+                "hideMethod": "fadeOut"
+            }
+          }
+          $('.sliderstatus').removeAttr("disabled")
+          $('#counting').load(' #counting')
+        }
+      });
+    });
+  </script>
+  <script>
+    var input = document.getElementById("b-search");
+    input.addEventListener("change", function () {
+        var keyword = input.value;
+        var status = "{{request.GET.status}}" || "all";
+        axios.get("{% url 'hometuitionapp:adminsliderlist' %}", { params: { keyword: keyword, } }).then(function (resp) {
+            const doc = document.createElement("div");
+            doc.innerHTML = resp.data;
+            document.querySelector(".table-responsive").innerHTML = doc.querySelector(".table-responsive").innerHTML
+            history.pushState("", "", `?keyword=${keyword}&status=${status}`)
+        })
+    });
+</script>
+
+{% endblock %}

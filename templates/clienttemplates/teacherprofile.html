@@ -42,15 +42,16 @@
                 <p> {{ profile.countrating }} Review(s) </p>
             </div>
             <p>Gender: {{profile.gender}}</p>
-            <p>Phone_no: {{profile.phone_no}}</p>
+            <!-- <p>Phone_no: {{profile.phone_no}}</p> -->
             <p>Email:{{profile.email}}</p>
             <p>Address:{{profile.address}}</p>
             <p>Education:{{profile.education}}</p>
             <p>Experience:{{profile.experience}}</p>
             <!-- <p>CV:{{profile.cv}}</p>
             <p>Citizenship:{{profile.citizenship}}</p> -->
-            <p>Course:{{profile.course}}</p>
-            <p>Subject:{{profile.subject}}</p>
+            
+            <p>Course:{% for c in profile.course.all %}{{c.name}}{% endfor %}</p>
+            <p>Subject:{% for s in profile.subject.all %}{{s.name}}{% endfor %}</p>
             <a class="hire_teacher btn btn-success">Hire</a>
 
         </div>    

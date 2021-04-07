@@ -52,6 +52,18 @@ urlpatterns = [
     path("ajax/hiring/accept/request/", AjaxHiringAcceptRequestView.as_view(), name="ajaxacceptrequest"),
     path("ajax/hiring/reject/request", AjaxHiringRejectRequestView.as_view(), name="ajaxrejectrequest"),
     path('payment/status/', PaymentStatusView.as_view(), name="paymentstatus"),
+    path('teacher/subject/fee/', TeacherSubjectFee.as_view(), name="subjectfee"),
+    path('teacher/ticket/create/', TeacherTicketCreate.as_view(), name="teacherticketcreate"),
+    path('teacher/ticket/list/', TeacherTicketList.as_view(), name="teacherticketlist"),
+    path('teacher/ticket/<int:pk>/detail/', TeacherTicketDetailView.as_view(), name="teacherticketdetail"),
+    path('ticket-raise-remark/<int:pk>/',
+         AjaxTicketRaiseRemarkView.as_view(), name='ajaxticketraiseremarkview'),
+    path('student/ticket/create/', StudentTicketCreate.as_view(), name="studentticketcreate"),
+
+    path('student/ticket/list/', StudentTicketList.as_view(), name="studentticketlist"),
+    path('student/ticket/<int:pk>/detail/', StudentTicketDetailView.as_view(), name="studentticketdetail"),
+     
+    
 
 
     # admin side
@@ -103,5 +115,21 @@ urlpatterns = [
      path('system_admin/ajax/search/', 
      AdminAjaxTeacherSearchView.as_view(), name='adminajaxteachersearch'),
     path('adminlogout/', AdminLogoutView.as_view(), name="adminlogout"),
+
+    #slider
+    path('system_admin/slider/list/', AdminSliderListView.as_view(), name="adminsliderlist"),
+    path("system_admin/slider/create/",
+         AdminSliderCreateView.as_view(), name="adminslidercreate"),
+    path("system_admin/slider/<int:pk>/update/",
+         AdminSliderUpdateView.as_view(), name="adminsliderupdate"),
+    path("system_admin/slider/<int:pk>/delete/",
+         AdminSliderDeleteView.as_view(), name="adminsliderdelete"),
+     path('system_admin/slider/<int:pk>/detail/',
+        AdminSliderDetailView.as_view(), name="adminsliderdetail"),
+
+     path('system_admin/ticket/list/', AdminTicketList.as_view(), name='adminticketlist'),
+     path('sytem_admin/ticket/<int:pk>/detail/', AdminTicketDetailView.as_view(), name="adminticketdetail"),
+     path('ajax/ticketraise/status/',
+         AjaxTicketRaiseStatusView.as_view(), name='ajaxticketraisestatus'),
 
 ]

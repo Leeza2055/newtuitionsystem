@@ -35,7 +35,7 @@ class StudentRegisterForm(forms.ModelForm):
         "class": "form-control",
 
     }))
-    phone_no = forms.CharField(widget=forms.TextInput(attrs={
+    phone_no = forms.IntegerField(widget=forms.NumberInput(attrs={
         "class": "form-control",
 
     }))
@@ -43,11 +43,19 @@ class StudentRegisterForm(forms.ModelForm):
         "class": "form-control",
 
     }))
+    salary = forms.IntegerField(widget=forms.NumberInput(attrs={
+        "class": "form-control",
+    }))
+    time = forms.CharField(widget=forms.Textarea(attrs={
+        'class': 'form-control',
+    }))
+    
+
 
     class Meta:
         model = Student
         fields = ['username', 'email', 'password', 'confirm_password', 'name',
-                  'phone_no', 'address', 'report_card', 'course', 'subject']
+                  'phone_no', 'address', 'report_card', "tuition_type", "salary", "time"]
 
     def clean_username(self):
         uname = self.cleaned_data["username"]
@@ -108,11 +116,7 @@ class TeacherRegisterForm(forms.ModelForm):
         "class": "form-control",
 
     }))
-    phone_no = forms.CharField(widget=forms.TextInput(attrs={
-        "class": "form-control",
-
-    }))
-    education = forms.CharField(widget=forms.TextInput(attrs={
+    phone_no = forms.IntegerField(widget=forms.NumberInput(attrs={
         "class": "form-control",
 
     }))
@@ -124,23 +128,23 @@ class TeacherRegisterForm(forms.ModelForm):
     teaching_experience = forms.CharField(widget=forms.Textarea(attrs={
         'class': 'form-control',
     }))
-
-    monthly_fee = forms.CharField(widget=forms.NumberInput(attrs={
-        "class": "form-control",
-
-    }))
-
     availabilty = forms.CharField(widget=forms.Textarea(attrs={
         "class": "form-control",
 
+    }))
+    reference_person = forms.CharField(widget=forms.TextInput(attrs={
+        "class": "form-control",
+    }))
+    reference_person_contact_no = forms.CharField(widget=forms.NumberInput(attrs={
+        'class': "form-control",
     }))
 
 
     class Meta:
         model = Teacher
         fields = ['username', 'email', 'password', 'confirm_password', 'name', 'gender', 'photo',
-                  'phone_no', 'address', 'education', 'cv', 'citizenship', 'course', 'subject',
-                  'can_teach_location','teaching_experience','monthly_fee',
+                  'phone_no', 'address', 'education', 'cv', 'citizenship',
+                  'can_teach_location','teaching_experience',
                   'training_license','availabilty','reference_person','reference_person_contact_no',]
 
     def clean_username(self):
@@ -175,25 +179,59 @@ class TeacherUpdateForm(forms.ModelForm):
         "class": "form-control",
 
     }))
+    
+    photo = forms.ImageField(widget=forms.FileInput(attrs={
+        'class': 'form-control',
+    }))
     address = forms.CharField(widget=forms.TextInput(attrs={
         "class": "form-control",
 
     }))
-    phone_no = forms.CharField(widget=forms.TextInput(attrs={
+    phone_no = forms.IntegerField(widget=forms.NumberInput(attrs={
         "class": "form-control",
 
     }))
-    education = forms.CharField(widget=forms.TextInput(attrs={
+    education = forms.ChoiceField(choices=EDUCATION, widget=forms.Select(attrs={
         "class": "form-control",
 
     }))
-   
+    can_teach_location = forms.CharField(widget=forms.Textarea(attrs={
+        "class": "form-control",
+
+    }))
+
+    teaching_experience = forms.CharField(widget=forms.Textarea(attrs={
+        'class': 'form-control',
+    }))
+    cv = forms.FileField(widget=forms.FileInput(attrs={
+        'class': 'form-control',
+    }))
+    citizenship = forms.FileField(widget=forms.FileInput(attrs={
+        'class': 'form-control'
+    }))
+    training_license = forms.ChoiceField(choices=TRAINING, widget=forms.Select(attrs={
+        'class': 'form-control',
+    }))
+    availabilty = forms.CharField(widget=forms.Textarea(attrs={
+        "class": "form-control",
+
+    }))
+    reference_person = forms.CharField(widget=forms.TextInput(attrs={
+        "class": "form-control",
+    }))
+    reference_person_contact_no = forms.CharField(widget=forms.NumberInput(attrs={
+        'class': "form-control",
+    }))
+
 
     class Meta:
         model = Teacher
-        fields = ['email','name', 'gender', 'photo',
-                  'phone_no', 'address', 'education', 'cv', 'citizenship', 'course', 'subject']
+        fields = ['name', 'photo','email','phone_no', 'address', 'education', 'cv', 'citizenship',
+                  'can_teach_location','teaching_experience',
+                  'training_license','availabilty','reference_person','reference_person_contact_no',]
+   
 
+    
 class StudentUpdateForm(forms.ModelForm):
     email = forms.CharField(widget=forms.TextInput(attrs={
         "class": "form-control",
@@ -203,7 +241,7 @@ class StudentUpdateForm(forms.ModelForm):
         "class": "form-control",
 
     }))
-    phone_no = forms.CharField(widget=forms.TextInput(attrs={
+    phone_no = forms.IntegerField(widget=forms.NumberInput(attrs={
         "class": "form-control",
 
     }))
@@ -211,10 +249,26 @@ class StudentUpdateForm(forms.ModelForm):
         "class": "form-control",
 
     }))
+    tuition_type = forms.ChoiceField(choices=Tuition_type, widget=forms.Select(attrs={
+        "class": "form-control",
+    }))
+    salary = forms.IntegerField(widget=forms.NumberInput(attrs={
+        "class": "form-control",
+    }))
+    report_card = forms.FileField(widget=forms.FileInput(attrs={
+        'class': 'form-control',
+       
+    }))
+    time = forms.CharField(widget=forms.Textarea(attrs={
+        'class': 'form-control',
+    }))
+    
+
 
     class Meta:
         model = Student
-        fields = ['email', 'name','phone_no', 'address', 'report_card', 'course', 'subject']
+        fields = ['email','name',
+                  'phone_no', 'address', 'report_card', "tuition_type", "salary", "time"]
 
 class RatingForm(forms.ModelForm):
     class Meta:
@@ -263,6 +317,42 @@ class TeacherNotification(forms.ModelForm):
 #         model = Payment
 #         fields = "__all__"
     
+class TeacherSubjectFee(forms.ModelForm):
+    class Meta:
+        model = SubjectFee
+        fields = "__all__"
 
 
-        
+class SliderForm(forms.ModelForm):
+    class Meta:
+        model = Slider
+        fields = ['title', 'content', 'image','status']
+
+
+class TicketRaiseForm(forms.ModelForm):
+    class Meta:
+        model = TicketRaise
+        fields = [ 'issue_type', 'issue']
+        widgets = {
+       
+        'issue_type': forms.Select(attrs={
+            'class': 'form-control', 
+            'placeholder': 'Issue Type',
+            }),
+        'issue': forms.Textarea(attrs={
+            'class': 'form-control', 
+            'placeholder': 'Describe Your Issue',
+            })
+        }
+
+class TicketRaiseRemarkForm(forms.ModelForm):
+    class Meta:
+        model = TicketRaiseRemark
+        fields = ['issue_remark']
+        widgets = {
+        'issue_remark': forms.Textarea(attrs={
+            'class': 'input-msg-send form-control',
+            'placeholder': 'Enter Message',
+            'rows': 3,
+            }),
+        }

@@ -98,6 +98,11 @@ class StudentRegisterView(SuccessMessageMixin, CreateView):
     success_url = reverse_lazy("hometuitionapp:studentlogin")
     success_message ="A confirmation email has been sent to %(email)s. Please confirm to finish registering."  
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['course'] = Course.objects.all()
+        return context
+
     def form_valid(self, form):
         uname = form.cleaned_data['username']
         password = form.cleaned_data['password']
@@ -108,6 +113,18 @@ class StudentRegisterView(SuccessMessageMixin, CreateView):
 
         user.is_active = False
         user.save()
+        student = form.save()
+        print(student)
+        subject = Subject.objects.all()
+        for s in subject:
+            selected_subject = self.request.POST.get(f"subject__{s.id}")
+            if selected_subject == "on":
+                sub = Subject.objects.get(id=s.id)
+                student.subject.add(sub)
+                student.course.add(sub.course)
+                print("on")
+            else:
+                print("none")
         # test_data = User.objects.get(id=user1.id).id
         # print("sjdbfisdjfsdkjfk",test_data)
         token = user_tokenizer.make_token(user1)
@@ -216,7 +233,15 @@ class TeacherRegisterView(SuccessMessageMixin, CreateView):
     success_url = reverse_lazy("hometuitionapp:teacherlogin")
     success_message =  "A confirmation email has been sent to %(email)s. Please confirm to finish registering." 
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['course'] = Course.objects.all()
+        
+
+        return context
+
     def form_valid(self, form):
+        # print('++++++++++')
         uname = form.cleaned_data['username']
         password = form.cleaned_data['password']
         email = form.cleaned_data['email']
@@ -226,6 +251,19 @@ class TeacherRegisterView(SuccessMessageMixin, CreateView):
 
         user.is_active = False
         user.save()
+        teacher = form.save()
+        # print(teacher)
+        subject = Subject.objects.all()
+        for s in subject:
+            selected_subject = self.request.POST.get(f"subject__{s.id}")
+            if selected_subject == "on":
+                sub = Subject.objects.get(id=s.id)
+                teacher.subject.add(sub)
+                teacher.course.add(sub.course)
+                print("on")
+            else:
+                print("none")
+            
         # test_data = User.objects.get(id=user1.id).id
         # print("sjdbfisdjfsdkjfk",test_data)
         token = user_tokenizer.make_token(user1)
@@ -523,7 +561,7 @@ class AjaxTeacherHireView(View):
 class PaymentStatusView(TemplateView):
     template_name = "clienttemplates/payment.html"
 
-class StudentNotificationUpdateView(SuccessMessageMixin,TeacherRequiredMixin, UpdateView):
+class StudentNotificationUpdateView(TeacherRequiredMixin, UpdateView):
     template_name = "clienttemplates/studentnotificationcreate.html"
     form_class = TeacherNotification
     success_url = reverse_lazy("hometuitionapp:teacherhome")
@@ -563,9 +601,182 @@ class AjaxHiringRejectRequestView(View):
 
         return JsonResponse({"message":"success"})
 
+class TeacherSubjectFee(TeacherRequiredMixin, CreateView):
+    template_name = "clienttemplates/teachersubjectfee.html"
+    form_class = TeacherSubjectFee
+    success_url = reverse_lazy("hometuitionapp:teacherhome")
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        subject = SubjectFee.objects.all()
+        return context
 
 
-class AdminRequiredMixin(object):
+class TeacherTicketCreate(TeacherRequiredMixin,CreateView):
+    template_name = "clienttemplates/teacherticketcreate.html"
+    form_class = TicketRaiseForm
+    model = TicketRaise
+    success_url = reverse_lazy("hometuitionapp:teacherhome")
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        teacher = Teacher.objects.get(user=self.request.user)
+        context['teacher'] = teacher
+        return context
+    
+    def form_valid(self, form):
+        teacher = Teacher.objects.get(user=self.request.user)
+        sender_content_type = ContentType.objects.get(app_label='hometuitionapp', model='teacher')
+        receiver_content_type = ContentType.objects.get(app_label='hometuitionapp', model='hometuitionsystem') 
+        receiver = HomeTuitionSystem.objects.first()   
+        form.instance.sender_type = sender_content_type
+        form.instance.receiver_type = receiver_content_type
+        form.instance.sender_id = teacher.id
+        form.instance.receiver_id = receiver.id
+        print(form.instance.receiver_id )
+
+        return super().form_valid(form)
+    
+class TeacherTicketList(TeacherRequiredMixin, TemplateView):
+    template_name = "clienttemplates/teacherticketlist.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        content_type = ContentType.objects.get(
+            app_label='hometuitionapp', model='teacher')
+        ticketraiselist = TicketRaise.objects.filter(
+            sender_type=content_type,
+            sender_id=self.request.user.teacher.id).order_by("-id")
+
+        context['ticketraiselist'] = ticketraiselist
+        return context
+
+class TeacherTicketDetailView(TeacherRequiredMixin, DetailView):
+    template_name = 'clienttemplates/teacherticketraisedetail.html'
+    model = TicketRaise
+    context_object_name = 'ticketraisedetail'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['ticketraiseremarkform'] = TicketRaiseRemarkForm
+        if self.request.GET.get('from'):
+            context['viewer'] = 'viewer'
+        return context
+
+
+class StudentTicketCreate(StudentRequiredMixin,CreateView):
+    template_name = "clienttemplates/studentticketcreate.html"
+    form_class = TicketRaiseForm
+    model = TicketRaise
+    success_url = reverse_lazy("hometuitionapp:studenthome")
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        student = Student.objects.get(user=self.request.user)
+        context['student'] = student
+        return context
+    
+    def form_valid(self, form):
+        student = Student.objects.get(user=self.request.user)
+        sender_content_type = ContentType.objects.get(app_label='hometuitionapp', model='student')
+        receiver_content_type = ContentType.objects.get(app_label='hometuitionapp', model='hometuitionsystem') 
+        receiver = HomeTuitionSystem.objects.first()   
+        form.instance.sender_type = sender_content_type
+        form.instance.receiver_type = receiver_content_type
+        form.instance.sender_id = student.id
+        form.instance.receiver_id = receiver.id
+
+        return super().form_valid(form)
+    
+class StudentTicketList(StudentRequiredMixin, TemplateView):
+    template_name = "clienttemplates/studentticketlist.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        content_type = ContentType.objects.get(
+            app_label='hometuitionapp', model='student')
+        ticketraiselist = TicketRaise.objects.filter(
+            sender_type=content_type,
+            sender_id=self.request.user.student.id).order_by("-id")
+
+        context['ticketraiselist'] = ticketraiselist
+        return context
+
+class StudentTicketDetailView(StudentRequiredMixin, DetailView):
+    template_name = 'clienttemplates/studentticketraisedetail.html'
+    model = TicketRaise
+    context_object_name = 'ticketraisedetail'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['ticketraiseremarkform'] = TicketRaiseRemarkForm
+        if self.request.GET.get('from'):
+            context['viewer'] = 'viewer'
+        return context
+
+class AjaxTicketRaiseRemarkView(View):
+    def get(self, request, *arg, **kwargs):
+        pk = self.kwargs['pk']
+        text = request.GET.get('text')
+        request_from = request.GET.get('request_from')
+        ticketraise = TicketRaise.objects.get(id=pk)
+        print(text)
+        if request_from == 'hometuitionsystem':
+            content_type = ContentType.objects.get(
+                app_label='hometuitionapp', model='hometuitionsystem')
+            sender = HomeTuitionSystem.objects.first()
+            print('+++++++++++++')
+            try:
+                TicketRaiseRemark.objects.create(
+                    ticket=ticketraise,
+                    issue_remark=text,
+                    sender_type=content_type,
+                    sender_id=sender.id,
+                    is_problem_solver=True
+                )
+            except:
+                pass
+        elif request_from == 'teacher':
+            content_type = ContentType.objects.get(
+                app_label='hometuitionapp', model='teacher')
+            sender = Teacher.objects.get(
+                    id=self.request.GET.get('teacher_id'))
+            print('**********')
+            try:
+                TicketRaiseRemark.objects.create(
+                    ticket=ticketraise,
+                    issue_remark=text,
+                    sender_type=content_type,
+                    sender_id=sender.id,
+                    is_problem_solver=True
+                )
+            except:
+                pass
+        elif request_from == 'student':
+            content_type = ContentType.objects.get(
+                app_label='hometuitionapp', model='student')
+            try:
+                sender = Student.objects.get(
+                    id=self.request.GET.get('student_id'))
+                TicketRaiseRemark.objects.create(
+                    ticket=ticketraise,
+                    issue_remark=text,
+                    sender_type=content_type,
+                    sender_id=sender.id
+                )
+            except:
+                pass
+        
+        return render(
+            self.request,
+            'admintemplates/ajaxticketraiseremark.html', {
+                'ticketraisedetail': ticketraise,
+                'ticketraiseremarkform': TicketRaiseRemarkForm,
+                'request_from': request_from,
+            })
+
+
+class AdminRequiredMixin(SuccessMessageMixin, object):
     def dispatch(self, request, *args, **kwargs):
         if not request.user.is_superuser:
             return redirect("/adminlogin/")
@@ -786,3 +997,140 @@ class AdminLogoutView(View):
         logout(request)
         return redirect("/adminlogin/")
     
+class AdminSliderListView(AdminRequiredMixin, ListView):
+    template_name = "admintemplates/adminsliderlist.html"
+    queryset = Slider.objects.all().order_by("-id")
+    context_object_name = "all_sliders"
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        if "keyword" in self.request.GET:
+            keyword = self.request.GET.get("keyword", "")
+            new_queryset = queryset.filter(title__icontains=keyword)
+        else:
+            new_queryset = queryset
+
+        if "status" in self.request.GET:
+            status = self.request.GET.get("status", "all")
+            if status == "all" or status == "":
+                new_queryset = queryset
+            else:
+                new_queryset = queryset.filter(status__iexact=status)
+        return new_queryset
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        all_slider = self.queryset
+        context['allcount'] = all_slider.count()
+        context['active'] = all_slider.filter(status="Active").count()
+        context['inactive'] = all_slider.filter(status="Inactive").count()
+        context['disabled'] = all_slider.filter(status="Disabled").count()
+
+        return context
+
+    def post(self, request, *args, **kwargs):
+        this_obj = Slider.objects.get(id=request.POST.get("slider_id"))
+        if this_obj.status == "Active":
+            this_obj.status = "Disabled"
+        elif this_obj.status == "Inactive":
+            this_obj.status = "Active"
+        elif this_obj.status == "Disabled":
+            this_obj.status = "Active"
+        this_obj.save()
+
+        return JsonResponse({"message":"success"})
+
+
+class AdminSliderCreateView(AdminRequiredMixin, CreateView):
+    template_name = "admintemplates/slidercreate.html"
+    form_class = SliderForm
+    success_url = reverse_lazy("hometuitionapp:adminsliderlist")
+    success_message = " Created Successfully!!!"
+
+    def get_success_message(self, cleaned_data):
+        title = cleaned_data['title']
+        return title + self.success_message
+
+
+class AdminSliderUpdateView(AdminRequiredMixin, UpdateView):
+    template_name = "admintemplates/slidercreate.html"
+    form_class = SliderForm
+    success_url = reverse_lazy("hometuitionapp:adminsliderlist")
+    model = Slider
+    success_message = " Updated Successfully!!!"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['update'] = 'update'
+
+        return context
+    
+    def get_success_message(self, cleaned_data):
+        title = cleaned_data['title']
+        return title + self.success_message
+
+    def form_valid(self, form):
+        print("form valid")
+        return super().form_valid(form)
+
+    def form_invalid(self, form):
+        print("form invalid")
+        return super().form_invalid(form)
+
+
+class AdminSliderDeleteView(AdminRequiredMixin, DeleteView):
+    template_name = "admintemplates/sliderdelete.html"
+    success_url = reverse_lazy("hometuitionapp:adminsliderlist")
+    model = Slider
+    success_message = " Deleted Successfully!!!"
+
+    def delete(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        messages.success(self.request, self.object.title + self.success_message)
+        return super(AdminSliderDeleteView, self).delete(request, *args, **kwargs)
+
+class AdminSliderDetailView(AdminRequiredMixin, DetailView):
+    template_name = "admintemplates/sliderdetail.html"
+    model = Slider
+    context_object_name = "sliderobj"
+
+class AdminTicketList(AdminRequiredMixin, TemplateView):
+    template_name = "admintemplates/ticketlist.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        content_type = ContentType.objects.get(
+            app_label='hometuitionapp', model='hometuitionsystem')
+        org = HomeTuitionSystem.objects.first()
+        ticketraiselist = TicketRaise.objects.filter(
+            receiver_type=content_type,
+            receiver_id=org.id).order_by("-id")
+
+
+        context['ticketraiselist'] = ticketraiselist
+
+        return context
+
+class AdminTicketDetailView(AdminRequiredMixin, DetailView):
+    template_name = 'admintemplates/adminticketraisedetail.html'
+    model = TicketRaise
+    context_object_name = 'ticketraisedetail'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['ticketraiseremarkform'] = TicketRaiseRemarkForm
+        if self.request.GET.get('from'):
+            context['viewer'] = 'viewer'
+        return context
+
+class AjaxTicketRaiseStatusView(View):
+    def get(self, request, *args, **kwargs):
+        pk = self.request.GET.get('id')
+        this_ticket = TicketRaise.objects.get(id=pk)
+        remark = this_ticket.ticketraiseremark_set.all()
+        if this_ticket.issue_solved:
+            return JsonResponse({'message': 'Error'})
+        else:
+            this_ticket.issue_solved = True
+            this_ticket.save()
+            return JsonResponse({'message': 'success'})

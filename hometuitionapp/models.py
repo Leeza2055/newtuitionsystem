@@ -1,4 +1,6 @@
 from django.db import models
+from django.contrib.contenttypes.fields import GenericForeignKey
+from django.contrib.contenttypes.models import ContentType
 from django.contrib.auth.models import User, Group
 from django.db.models import Avg, Count
 from django.db.models.signals import post_save
@@ -64,6 +66,20 @@ GENDER = (
     ("other", "OTHER"),
 )
 
+EDUCATION = (
+    ("Secondary Level", "Secondary Level"),
+    ("Higher Secondary Level(Pursuing)","Higher Secondary Level(Pursuing)"),
+    ("Higher Secondary Level(Completed)","Higher Secondary Level(Completed)"),
+    ("Bachelors Degree(Pursuing)","Bachelors Degree(Pursuing)"),
+    ("Bachelors Degree(Completed)","Bachelors Degree(Completed)"),
+    ("Masters Degree(Pursuing)", "Masters Degree(Pursuing)"),
+    ("Masters Degree(Completed)", "Masters Degree(Completed)"),
+    
+)
+TRAINING = (
+    ('Yes', 'Yes'),
+    ('No', 'No'),
+)
 
 class Teacher(TimeStamp):
     user = models.OneToOneField(
@@ -74,14 +90,14 @@ class Teacher(TimeStamp):
     phone_no = models.CharField(max_length=40)
     email = models.EmailField()
     address = models.CharField(max_length=40)
-    education = models.CharField(max_length=100)
+    education = models.CharField(max_length=100, choices=EDUCATION)
     # experience = models.CharField(max_length=40)
     cv = models.FileField(upload_to="cv")
     citizenship = models.FileField(upload_to="citizenship")
     can_teach_location = models.TextField()
     teaching_experience = models.TextField()
-    monthly_fee = models.PositiveIntegerField()
-    training_license = models.BooleanField()
+    # monthly_fee = models.PositiveIntegerField()
+    training_license = models.CharField(max_length=30, choices=TRAINING)
     availabilty = models.TextField()
     reference_person = models.CharField(max_length=30)
     reference_person_contact_no = models.CharField(max_length=30)
@@ -119,6 +135,14 @@ class Teacher(TimeStamp):
 #     teacher = models.ForeignKey(Teacher, on_delete=models.CASCADE)
 #     course = models.ForeignKey(Course, on_delete=models.CASCADE)
 #     subject = models.ForeignKey(Subject, on_delete=models.CASCADE)
+class SubjectFee(TimeStamp):
+    teacher = models.ForeignKey(Teacher, on_delete=models.CASCADE)
+    course  = models.ForeignKey(Course, on_delete=models.CASCADE)
+    subject = models.ForeignKey(Subject, on_delete=models.CASCADE)
+    amount = models.PositiveIntegerField()
+
+    def __str__(self):
+        return self.subject.name
 
 
 class Rating(models.Model):
@@ -157,6 +181,19 @@ class Student(TimeStamp):
     def __str__(self):
         return self.name
 
+class TeacherStudentFee(TimeStamp):
+    teacher = models.ForeignKey(Teacher, on_delete=models.CASCADE)
+    student = models.ForeignKey(Student, on_delete=models.CASCADE)
+    course = models.ForeignKey(Course, on_delete=models.CASCADE)
+    subject = models.ForeignKey(Subject, on_delete=models.CASCADE)
+    amount = models.PositiveIntegerField()
+    payment_status = models.BooleanField()
+    payment_date = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return self.subject.name
+
+
 class Hiring(models.Model):
     teacher = models.ForeignKey(Teacher, on_delete=models.CASCADE)
     student = models.ForeignKey(Student, on_delete=models.CASCADE)
@@ -176,4 +213,124 @@ class Hiring(models.Model):
 
 #     def __str__(self):
 #         return self.teacher.name
+
+class Slider(TimeStamp):
+    title = models.CharField(max_length=100)
+    content = models.TextField()
+    image = models.ImageField(upload_to="slider")
+
+    def __str__(self):
+        return self.title
+
+class Facility(TimeStamp):
+    title = models.CharField(max_length=20)
+    description = models.TextField()
+    icon = models.CharField(max_length=50)
+    image = models.ImageField(upload_to="Facility")
+
+    def __str__(self):
+        return self.title
+
+
+class Event(TimeStamp):
+    title = models.CharField(max_length=20)
+    image = models.ImageField(upload_to="event")
+    content = models.TextField()
+    date = models.DateField()
+    venue = models.CharField(max_length=50)
+    time = models.CharField(max_length=50)
+
+    def __str__(self):
+        return self.title
+
+
+class Testimonials(TimeStamp):
+    name = models.CharField(max_length=20)
+    sayings = models.TextField()
+    current_engagement = models.CharField(max_length=50)
+    image = models.ImageField(upload_to="testimonials")
+
+    def __str__(self):
+        return self.name
+
+class Message(TimeStamp):
+    sender = models.CharField(max_length=100)
+    # mobile = models.CharField(max_length=10)
+    email = models.EmailField(null=True, blank=True)
+    subject = models.CharField(max_length=200)
+    message = models.TextField()
+
+    def __str__(self):
+        return self.sender
+
+class Subscriber(TimeStamp):
+    email = models.EmailField(unique=True)
+
+    def __str__(self):
+        return self.email
+
+class Faq(TimeStamp):
+    question = models.CharField(max_length=512)
+    answer = models.TextField()
+
+    def __str__(self):
+        return self.question
+
+
+LOGISTIC_NOTICE_TYPE = (
+    ('info', 'Info'),
+    ('success', 'Success'),
+    ('warning', 'Warning'),
+    ('danger', 'Danger'),
+)
+
+class Notice(TimeStamp):
+    title = models.CharField(max_length=1024)
+    content = models.TextField(null=True, blank=True)
+    notice_type = models.CharField(
+        max_length=100, choices=LOGISTIC_NOTICE_TYPE)
+
+    def __str__(self):
+        return self.title
+
+    class Meta:
+        ordering = ['-id']
+
+
+TICKET_REQUEST_LIMIT = models.Q(app_label='hometuitionapp', model='teacher') | models.Q(
+    app_label='hometuitionapp', model='student')
+
+TICKET_RECEIVER_LIMIT = models.Q(app_label='hometuitionapp', model='hometuitionsystem') | models.Q(
+    app_label='hometuitionapp', model='teacher')
+
+ISSUE_TYPE = (
+    ('General', 'General'),
+    ('Account', 'Account'),
+    ('Other', 'Other'),
+)
+
+class TicketRaise(TimeStamp):
+    sender_type = models.ForeignKey(
+        ContentType, on_delete=models.CASCADE, limit_choices_to=TICKET_REQUEST_LIMIT, related_name='trsenders')
+    sender_id = models.PositiveIntegerField()
+    sender = GenericForeignKey('sender_type', 'sender_id')
+    receiver_type = models.ForeignKey(
+        ContentType, on_delete=models.CASCADE, limit_choices_to=TICKET_RECEIVER_LIMIT, related_name='trreceivers')
+    receiver_id = models.PositiveIntegerField()
+    receiver = GenericForeignKey('receiver_type', 'receiver_id')
+    issue_type = models.CharField(max_length=200, choices=ISSUE_TYPE)
+    issue = models.TextField()
+    issue_solved = models.BooleanField(default=False)
+
+
+class TicketRaiseRemark(TimeStamp):
+    ticket = models.ForeignKey(TicketRaise, on_delete=models.CASCADE)
+    issue_remark = models.TextField(null=True, blank=True)
+    issue_closing_date = models.DateTimeField(null=True, blank=True)
+    sender_type = models.ForeignKey(
+        ContentType, on_delete=models.CASCADE, related_name='trrsenders')
+    sender_id = models.PositiveIntegerField()
+    sender = GenericForeignKey('sender_type', 'sender_id')
+    is_problem_solver = models.BooleanField(
+        default=False, null=True, blank=True)
 
