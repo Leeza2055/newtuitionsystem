@@ -45,9 +45,11 @@ class StudentRegisterForm(forms.ModelForm):
     }))
     salary = forms.IntegerField(widget=forms.NumberInput(attrs={
         "class": "form-control",
+        "placeholder": "In Rs. Per Month(Price Range e.g Rs.2000-Rs.3000)"
     }))
     time = forms.CharField(widget=forms.Textarea(attrs={
         'class': 'form-control',
+        "placeholder": "Eg. 5pm-7pm"
     }))
     
 
@@ -122,14 +124,18 @@ class TeacherRegisterForm(forms.ModelForm):
     }))
     can_teach_location = forms.CharField(widget=forms.Textarea(attrs={
         "class": "form-control",
+        "placeholder": "Eg: Baneshwor, Gwarko"
 
     }))
 
     teaching_experience = forms.CharField(widget=forms.Textarea(attrs={
         'class': 'form-control',
+        "placeholder": "Experience in years and other details..."
+
     }))
     availabilty = forms.CharField(widget=forms.Textarea(attrs={
         "class": "form-control",
+        "placeholder": "Eg: 5pm-7pm"
 
     }))
     reference_person = forms.CharField(widget=forms.TextInput(attrs={
@@ -180,9 +186,7 @@ class TeacherUpdateForm(forms.ModelForm):
 
     }))
     
-    photo = forms.ImageField(widget=forms.FileInput(attrs={
-        'class': 'form-control',
-    }))
+   
     address = forms.CharField(widget=forms.TextInput(attrs={
         "class": "form-control",
 
@@ -191,10 +195,7 @@ class TeacherUpdateForm(forms.ModelForm):
         "class": "form-control",
 
     }))
-    education = forms.ChoiceField(choices=EDUCATION, widget=forms.Select(attrs={
-        "class": "form-control",
-
-    }))
+    
     can_teach_location = forms.CharField(widget=forms.Textarea(attrs={
         "class": "form-control",
 
@@ -203,15 +204,7 @@ class TeacherUpdateForm(forms.ModelForm):
     teaching_experience = forms.CharField(widget=forms.Textarea(attrs={
         'class': 'form-control',
     }))
-    cv = forms.FileField(widget=forms.FileInput(attrs={
-        'class': 'form-control',
-    }))
-    citizenship = forms.FileField(widget=forms.FileInput(attrs={
-        'class': 'form-control'
-    }))
-    training_license = forms.ChoiceField(choices=TRAINING, widget=forms.Select(attrs={
-        'class': 'form-control',
-    }))
+    
     availabilty = forms.CharField(widget=forms.Textarea(attrs={
         "class": "form-control",
 
@@ -273,7 +266,7 @@ class StudentUpdateForm(forms.ModelForm):
 class RatingForm(forms.ModelForm):
     class Meta:
         model = Rating
-        fields = ['rate']
+        fields = ['rate', 'comment']
 
 
 class HomeTuitionSystemForm(forms.ModelForm):

@@ -19,7 +19,15 @@
                             {% for notification  in studentnotificationlist %}
                             		<tr>
                             			<td>{{forloop.counter}}</td>
-                            			<td><a href="" >{{notification.teacher}} accepted the request of {{notification.student}} at {{notification.hire_date}}</a></td>
+                            			<td><a href="" >
+                                            {% if notification.accept is True and  notification.reject is False  %}
+                                            {{notification.teacher}} accepted the request of {{notification.student}} at {{notification.hire_date}}
+                                            {% elif notification.accept is False and  notification.reject is True %}
+                                            {{notification.teacher}} rejected the request of {{notification.student}} at {{notification.hire_date}}
+                                            {% else %}
+                                            Request sent to {{notification.teacher}} at {{notification.hire_date}}
+                                            {% endif %}
+                                        </a></td>
                             		</tr>
                             {% endfor %}
                         </tbody>

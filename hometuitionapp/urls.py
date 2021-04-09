@@ -43,6 +43,8 @@ urlpatterns = [
     path('logout/', LogoutView.as_view(), name="logout"),
     path('teacher/notification/create/', TeacherNotificationCreateView.as_view(), name="teachernotificationcreate"),
     path('teacher/hire/', AjaxTeacherHireView.as_view(), name="ajaxhireteacher"),
+    path('teacher/payment/', AjaxHirePaymentView.as_view(), name="ajaxhirepayment"),
+    
     # path('student/accept/', AjaxStudentAcceptView.as_view(), name="ajaxstudentaccept"),
     path('student/<int:pk>notification/update/', StudentNotificationUpdateView.as_view(), name="studentnotificationupdate"),
     path('teacher/notification/list/', TeacherNotificationListView.as_view(), name="teachernotificationlist"),
@@ -62,6 +64,8 @@ urlpatterns = [
 
     path('student/ticket/list/', StudentTicketList.as_view(), name="studentticketlist"),
     path('student/ticket/<int:pk>/detail/', StudentTicketDetailView.as_view(), name="studentticketdetail"),
+    path('terms_and_conditions/', StudentTermsView.as_view(), name="studentterms"),
+    path('terms_and_conditiont/', TeacherTermsView.as_view(), name="teacherterms"),
      
     
 
@@ -107,9 +111,9 @@ urlpatterns = [
     path('system_admin/teacher/<int:pk>/detail/',
          AdminTeacherDetailView.as_view(), name="adminteacherdetail"),
 
-    path('system_admin/teacher/<int:pk>/update',
+    path('system_admin/teacher/<int:pk>/update/',
          AdminTeacherUpdateView.as_view(), name="adminteacherupdate"),
-    path('system_admin/teacher/<int:pk>delete',
+    path('system_admin/teacher/<int:pk>/delete/',
          AdminTeacherDeleteView.as_view(), name="adminteacherdelete"),
 
      path('system_admin/ajax/search/', 
@@ -131,5 +135,6 @@ urlpatterns = [
      path('sytem_admin/ticket/<int:pk>/detail/', AdminTicketDetailView.as_view(), name="adminticketdetail"),
      path('ajax/ticketraise/status/',
          AjaxTicketRaiseStatusView.as_view(), name='ajaxticketraisestatus'),
+     
 
 ]

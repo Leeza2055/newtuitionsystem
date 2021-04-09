@@ -256,10 +256,13 @@ class TeacherRegisterView(SuccessMessageMixin, CreateView):
         subject = Subject.objects.all()
         for s in subject:
             selected_subject = self.request.POST.get(f"subject__{s.id}")
+            amount = self.request.POST.get(f"amount__{s.id}")
             if selected_subject == "on":
                 sub = Subject.objects.get(id=s.id)
                 teacher.subject.add(sub)
                 teacher.course.add(sub.course)
+                
+                fee = SubjectFee.objects.create(teacher=teacher, course=sub.course, subject=sub, amount=amount)
                 print("on")
             else:
                 print("none")
@@ -339,7 +342,7 @@ class StudentHomeView(StudentRequiredMixin, ListView):
     template_name = "clienttemplates/studenthome.html"
 
     def get(self, request):
-        qs = Teacher.objects.all()
+        qs = Teacher.objects.filter(status="Active")
         subject_query = request.GET.get('subject')
         location_query = request.GET.get('location')
         
@@ -413,6 +416,7 @@ class TeacherProfileView(StudentRequiredMixin,DetailView):
         if form.is_valid():
             user_rate = form.cleaned_data['rate']
             teacher_id = self.kwargs["pk"]
+            comment = form.cleaned_data['comment']
             rated_teacher = Teacher.objects.get(id=teacher_id)
             current_user = request.user
             student_user = User.objects.get(id=current_user.id)
@@ -422,6 +426,8 @@ class TeacherProfileView(StudentRequiredMixin,DetailView):
                 defaults = { 'rate': user_rate,
                 'teacher' : rated_teacher,
                 'user' : student_user,
+                'comment': comment,
+
                 },
             )
             print(obj)
@@ -432,6 +438,13 @@ class TeacherProfileView(StudentRequiredMixin,DetailView):
             return HttpResponseRedirect(url)
         else:
             return render(self.request, url)
+        
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        teacher = Teacher.objects.get(id=self.kwargs['pk'])
+        fee = SubjectFee.objects.filter(teacher=teacher)
+        context['fee'] = fee
+        return context
 
     
             
@@ -447,6 +460,13 @@ class TeacherDetailView(TeacherRequiredMixin,DetailView):
     # context_object_name = "profile"
     context_object_name = "teacherdetail"
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        teacher = Teacher.objects.get(id=self.kwargs['pk'])
+        fee = SubjectFee.objects.filter(teacher=teacher)
+        context['fee'] = fee
+        return context
+
 class TeacherDeleteView(TeacherRequiredMixin,DeleteView):
     template_name = "clienttemplates/teacherdelete.html"
     success_url = reverse_lazy("hometuitionapp:teacherregister")
@@ -458,6 +478,43 @@ class TeacherUpdateView(TeacherRequiredMixin,UpdateView):
     form_class = TeacherUpdateForm
     success_url = reverse_lazy("hometuitionapp:teacherhome")
     model = Teacher
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['course'] = Course.objects.all()
+        
+
+        return context
+
+    def form_valid(self, form):
+        teacher = form.save()
+        # print(teacher)
+        subject = Subject.objects.all()
+        for s in subject:
+            selected_subject = self.request.POST.get(f"subject__{s.id}")
+            if selected_subject == "on":
+                sub = Subject.objects.get(id=s.id)
+                teacher.subject.add(sub)
+                teacher.course.add(sub.course)
+                print("on")
+            else:
+                sub = Subject.objects.get(id=s.id)
+                teacher.subject.remove(sub)
+                course = sub.course
+                count = 0
+                for r in course.subject_set.all():
+                    if r in teacher.subject.all():
+                        count = 1
+                        print('++++++++++++')
+                if count == 1:
+                    print('count')
+                    pass
+                else:
+                    print('remove')
+                    teacher.course.remove(course)
+                print("none")
+        return super().form_valid(form)
+
 
 class StudentDetailView(StudentRequiredMixin,DetailView):
     template_name = "clienttemplates/studentdetail.html"
@@ -538,11 +595,29 @@ class AjaxTeacherHireView(View):
         teacher_id = request.POST.get("teacher_id")
         teacher = Teacher.objects.get(id=teacher_id)
         student = request.user.student
-        if Hiring.objects.filter(teacher=teacher, student=request.user.student).exists():
+        subject_id = request.POST.get("subject_id")
+        subject = Subject.objects.get(id=subject_id)
+        fee = SubjectFee.objects.get(teacher=teacher, subject=subject)
+        try:
+            if Hiring.objects.filter(teacher=teacher, student=request.user.student, subject=subject).exists():
+                return JsonResponse({"message":"already"})
+            else:
+                Hiring.objects.create(teacher=teacher, student=request.user.student, subject=subject, amount=fee.amount) 
+                return JsonResponse({"message":"success"})
+        except Exception as e:
+            print(e)
             return JsonResponse({"message":"already"})
-        else:
-            Hiring.objects.create(teacher=teacher, student=request.user.student)
-            return JsonResponse({"message":"success"})
+
+
+class AjaxHirePaymentView(View):
+    def get(self, request, *args, **kwargs):
+        obj = Hiring.objects.get(id=request.GET.get("hiring_id"))
+        obj.reject = False
+        obj.accept = True
+        obj.payment_status = True
+        obj.save()
+
+        return JsonResponse({"message":"success"})
 
 # class AjaxStudentAcceptView(View):
 #     def post(self, request, *args, **kwargs):
@@ -589,6 +664,7 @@ class AjaxHiringAcceptRequestView(View):
     def get(self, request, *args, **kwargs):
         obj = Hiring.objects.get(id=request.GET.get("hiring_id"))
         obj.accept = True
+        obj.reject = False
         obj.save()
 
         return JsonResponse({"message":"success"})
@@ -596,6 +672,7 @@ class AjaxHiringAcceptRequestView(View):
 class AjaxHiringRejectRequestView(View):
     def get(self, request, *args, **kwargs):
         obj = Hiring.objects.get(id=request.GET.get("hiring_id"))
+        obj.reject = True
         obj.accept = False
         obj.save()
 
@@ -612,6 +689,12 @@ class TeacherSubjectFee(TeacherRequiredMixin, CreateView):
         return context
 
 
+class StudentTermsView(TemplateView):
+    template_name = "clienttemplates/terms_and_conditions_student.html"
+
+class TeacherTermsView(TemplateView):
+    template_name = "clienttemplates/terms_and_conditions_teacher.html"
+
 class TeacherTicketCreate(TeacherRequiredMixin,CreateView):
     template_name = "clienttemplates/teacherticketcreate.html"
     form_class = TicketRaiseForm
@@ -627,6 +710,7 @@ class TeacherTicketCreate(TeacherRequiredMixin,CreateView):
     def form_valid(self, form):
         teacher = Teacher.objects.get(user=self.request.user)
         sender_content_type = ContentType.objects.get(app_label='hometuitionapp', model='teacher')
+        print(ContentType.objects.all())
         receiver_content_type = ContentType.objects.get(app_label='hometuitionapp', model='hometuitionsystem') 
         receiver = HomeTuitionSystem.objects.first()   
         form.instance.sender_type = sender_content_type
@@ -748,7 +832,6 @@ class AjaxTicketRaiseRemarkView(View):
                     issue_remark=text,
                     sender_type=content_type,
                     sender_id=sender.id,
-                    is_problem_solver=True
                 )
             except:
                 pass
@@ -886,50 +969,240 @@ class AdminSubjectDeleteView(AdminRequiredMixin, DeleteView):
 class AdminStudentListView(AdminRequiredMixin, ListView):
     template_name = "admintemplates/adminstudentlist.html"
     queryset = Student.objects.all().order_by("-id")
-    context_object_name = "studentlist"
+    context_object_name = "all_students"
 
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        if "keyword" in self.request.GET:
+            keyword = self.request.GET.get("keyword", "")
+            new_queryset = queryset.filter(name__icontains=keyword)
+        else:
+            new_queryset = queryset
 
-class AdminStudentDetailView(AdminRequiredMixin, DetailView):
-    template_name = "admintemplates/adminstudentdetail.html"
-    model = Student
-    context_object_name = "studentdetail"
+        if "status" in self.request.GET:
+            status = self.request.GET.get("status", "all")
+            if status == "all" or status == "":
+                new_queryset = queryset
+            else:
+                new_queryset = queryset.filter(status__iexact=status)
+        return new_queryset
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        all_student = self.queryset
+        context['allcount'] = all_student.count()
+        context['active'] = all_student.filter(status="Active").count()
+        context['inactive'] = all_student.filter(status="Inactive").count()
+        context['disabled'] = all_student.filter(status="Disabled").count()
 
-class AdminStudentUpdateView(AdminRequiredMixin, UpdateView):
-    template_name = "admintemplates/adminstudentupdate.html"
-    form_class = StudentRegisterForm
-    success_url = reverse_lazy("hometuitionapp:adminstudentlist")
-    model = Student
+        return context
+
+    def post(self, request, *args, **kwargs):
+        this_obj = Student.objects.get(id=request.POST.get("student_id"))
+        if this_obj.status == "Active":
+            this_obj.status = "Disabled"
+        elif this_obj.status == "Inactive":
+            this_obj.status = "Active"
+        elif this_obj.status == "Disabled":
+            this_obj.status = "Active"
+        this_obj.save()
+
+        return JsonResponse({"message":"success"})
 
 
 class AdminStudentDeleteView(AdminRequiredMixin, DeleteView):
     template_name = "admintemplates/adminstudentdelete.html"
     success_url = reverse_lazy("hometuitionapp:adminstudentlist")
     model = Student
+    success_message = " Deleted Successfully!!!"
 
+    def delete(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        messages.success(self.request, self.object.name+ self.success_message)
+        return super(AdminStudentDeleteView, self).delete(request, *args, **kwargs)
+
+class AdminStudentDetailView(AdminRequiredMixin, DetailView):
+    template_name = "admintemplates/adminstudentdetail.html"
+    model = Student
+    context_object_name = "studentobj"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        student = Student.objects.get(id=self.kwargs['pk'])
+        return context
+
+class AdminStudentUpdateView(AdminRequiredMixin, UpdateView):
+    template_name = "admintemplates/adminstudentupdate.html"
+    form_class = StudentUpdateForm
+    success_url = reverse_lazy("hometuitionapp:adminstudentlist")
+    model = Student
+    success_message = " Updated Successfully!!!"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['update'] = 'update'
+
+        return context
+    
+    def get_success_message(self, cleaned_data):
+        username = cleaned_data['username']
+        return name + self.success_message
+
+    def form_valid(self, form):
+        print("form valid")
+        return super().form_valid(form)
+
+    def form_invalid(self, form):
+        print("form invalid")
+        return super().form_invalid(form)
+
+
+
+
+class AdminSliderListView(AdminRequiredMixin, ListView):
+    template_name = "admintemplates/adminsliderlist.html"
+    queryset = Slider.objects.all().order_by("-id")
+    context_object_name = "all_sliders"
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        if "keyword" in self.request.GET:
+            keyword = self.request.GET.get("keyword", "")
+            new_queryset = queryset.filter(title__icontains=keyword)
+        else:
+            new_queryset = queryset
+
+        if "status" in self.request.GET:
+            status = self.request.GET.get("status", "all")
+            if status == "all" or status == "":
+                new_queryset = queryset
+            else:
+                new_queryset = queryset.filter(status__iexact=status)
+        return new_queryset
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        all_slider = self.queryset
+        context['allcount'] = all_slider.count()
+        context['active'] = all_slider.filter(status="Active").count()
+        context['inactive'] = all_slider.filter(status="Inactive").count()
+        context['disabled'] = all_slider.filter(status="Disabled").count()
+
+        return context
+
+    def post(self, request, *args, **kwargs):
+        this_obj = Slider.objects.get(id=request.POST.get("slider_id"))
+        if this_obj.status == "Active":
+            this_obj.status = "Disabled"
+        elif this_obj.status == "Inactive":
+            this_obj.status = "Active"
+        elif this_obj.status == "Disabled":
+            this_obj.status = "Active"
+        this_obj.save()
+
+        return JsonResponse({"message":"success"})
 
 class AdminTeacherListView(AdminRequiredMixin, ListView):
     template_name = "admintemplates/adminteacherlist.html"
     queryset = Teacher.objects.all().order_by("-id")
-    context_object_name = "teacherlist"
+    context_object_name = "all_teachers"
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        print()
+        if "keyword" in self.request.GET:
+            keyword = self.request.GET.get("keyword", "")
+            print(keyword)
+            new_queryset = queryset.filter(name__icontains=keyword)
+        else:
+            new_queryset = queryset
+
+        if "status" in self.request.GET:
+            status = self.request.GET.get("status", "all")
+            if status == "all" or status == "":
+                new_queryset = queryset
+            else:
+                new_queryset = queryset.filter(status__iexact=status)
+        return new_queryset
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        all_teacher = self.queryset
+        context['allcount'] = all_teacher.count()
+        context['active'] = all_teacher.filter(status="Active").count()
+        context['inactive'] = all_teacher.filter(status="Inactive").count()
+        context['disabled'] = all_teacher.filter(status="Disabled").count()
+
+        return context
+
+    def post(self, request, *args, **kwargs):
+        this_obj = Teacher.objects.get(id=request.POST.get("teacher_id"))
+        if this_obj.status == "Active":
+            this_obj.status = "Disabled"
+        elif this_obj.status == "Inactive":
+            this_obj.status = "Active"
+        elif this_obj.status == "Disabled":
+            this_obj.status = "Active"
+        this_obj.save()
+
+        return JsonResponse({"message":"success"})
 
 
-class AdminTeacherUpdateView(AdminRequiredMixin, UpdateView):
-    template_name = "admintemplates/adminteacherupdate.html"
-    form_class = TeacherRegisterForm
-    success_url = reverse_lazy("hometuitionapp:adminteacherlist")
-    model = Teacher
+class AdminSliderCreateView(AdminRequiredMixin, CreateView):
+    template_name = "admintemplates/slidercreate.html"
+    form_class = SliderForm
+    success_url = reverse_lazy("hometuitionapp:adminsliderlist")
+    success_message = " Created Successfully!!!"
+
+    def get_success_message(self, cleaned_data):
+        title = cleaned_data['title']
+        return title + self.success_message
+
+class AdminSliderUpdateView(AdminRequiredMixin, UpdateView):
+    template_name = "admintemplates/slidercreate.html"
+    form_class = SliderForm
+    success_url = reverse_lazy("hometuitionapp:adminsliderlist")
+    model = Slider
+    success_message = " Updated Successfully!!!"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['update'] = 'update'
+
+        return context
+    
+    def get_success_message(self, cleaned_data):
+        title = cleaned_data['title']
+        return title + self.success_message
+
+    def form_valid(self, form):
+        print("form valid")
+        return super().form_valid(form)
+
+    def form_invalid(self, form):
+        print("form invalid")
+        return super().form_invalid(form)
 
 
-class AdminTeacherDeleteView(DeleteView):
-    template_name = "admintemplates/adminteacherdelete.html"
-    success_url = reverse_lazy("hometuitionapp:adminteacherlist")
-    model = Teacher
+class AdminSliderDeleteView(AdminRequiredMixin, DeleteView):
+    template_name = "admintemplates/sliderdelete.html"
+    success_url = reverse_lazy("hometuitionapp:adminsliderlist")
+    model = Slider
+    success_message = " Deleted Successfully!!!"
 
-class AdminTeacherDetailView(AdminRequiredMixin, DetailView):
-    template_name = "admintemplates/adminteacherdetail.html"
-    model = Teacher
-    context_object_name = "teacherdetail"
+    def delete(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        messages.success(self.request, self.object.title + self.success_message)
+        return super(AdminSliderDeleteView, self).delete(request, *args, **kwargs)
+
+class AdminSliderDetailView(AdminRequiredMixin, DetailView):
+    template_name = "admintemplates/sliderdetail.html"
+    model = Slider
+    context_object_name = "sliderobj"
+
+
+
+
 
 class AdminAjaxTeacherSearchView(View):
     def get(self, request, *args, **kwargs):
@@ -997,66 +1270,17 @@ class AdminLogoutView(View):
         logout(request)
         return redirect("/adminlogin/")
     
-class AdminSliderListView(AdminRequiredMixin, ListView):
-    template_name = "admintemplates/adminsliderlist.html"
-    queryset = Slider.objects.all().order_by("-id")
-    context_object_name = "all_sliders"
-
-    def get_queryset(self):
-        queryset = super().get_queryset()
-        if "keyword" in self.request.GET:
-            keyword = self.request.GET.get("keyword", "")
-            new_queryset = queryset.filter(title__icontains=keyword)
-        else:
-            new_queryset = queryset
-
-        if "status" in self.request.GET:
-            status = self.request.GET.get("status", "all")
-            if status == "all" or status == "":
-                new_queryset = queryset
-            else:
-                new_queryset = queryset.filter(status__iexact=status)
-        return new_queryset
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        all_slider = self.queryset
-        context['allcount'] = all_slider.count()
-        context['active'] = all_slider.filter(status="Active").count()
-        context['inactive'] = all_slider.filter(status="Inactive").count()
-        context['disabled'] = all_slider.filter(status="Disabled").count()
-
-        return context
-
-    def post(self, request, *args, **kwargs):
-        this_obj = Slider.objects.get(id=request.POST.get("slider_id"))
-        if this_obj.status == "Active":
-            this_obj.status = "Disabled"
-        elif this_obj.status == "Inactive":
-            this_obj.status = "Active"
-        elif this_obj.status == "Disabled":
-            this_obj.status = "Active"
-        this_obj.save()
-
-        return JsonResponse({"message":"success"})
 
 
-class AdminSliderCreateView(AdminRequiredMixin, CreateView):
-    template_name = "admintemplates/slidercreate.html"
-    form_class = SliderForm
-    success_url = reverse_lazy("hometuitionapp:adminsliderlist")
-    success_message = " Created Successfully!!!"
-
-    def get_success_message(self, cleaned_data):
-        title = cleaned_data['title']
-        return title + self.success_message
 
 
-class AdminSliderUpdateView(AdminRequiredMixin, UpdateView):
-    template_name = "admintemplates/slidercreate.html"
-    form_class = SliderForm
-    success_url = reverse_lazy("hometuitionapp:adminsliderlist")
-    model = Slider
+
+
+class AdminTeacherUpdateView(AdminRequiredMixin, UpdateView):
+    template_name = "admintemplates/adminteacherupdate.html"
+    form_class = TeacherUpdateForm
+    success_url = reverse_lazy("hometuitionapp:adminteacherlist")
+    model = Teacher
     success_message = " Updated Successfully!!!"
 
     def get_context_data(self, **kwargs):
@@ -1066,8 +1290,8 @@ class AdminSliderUpdateView(AdminRequiredMixin, UpdateView):
         return context
     
     def get_success_message(self, cleaned_data):
-        title = cleaned_data['title']
-        return title + self.success_message
+        username = cleaned_data['username']
+        return name + self.success_message
 
     def form_valid(self, form):
         print("form valid")
@@ -1078,21 +1302,28 @@ class AdminSliderUpdateView(AdminRequiredMixin, UpdateView):
         return super().form_invalid(form)
 
 
-class AdminSliderDeleteView(AdminRequiredMixin, DeleteView):
-    template_name = "admintemplates/sliderdelete.html"
-    success_url = reverse_lazy("hometuitionapp:adminsliderlist")
-    model = Slider
+class AdminTeacherDeleteView(AdminRequiredMixin, DeleteView):
+    template_name = "admintemplates/adminteacherdelete.html"
+    success_url = reverse_lazy("hometuitionapp:adminteacherlist")
+    model = Teacher
     success_message = " Deleted Successfully!!!"
 
     def delete(self, request, *args, **kwargs):
         self.object = self.get_object()
-        messages.success(self.request, self.object.title + self.success_message)
-        return super(AdminSliderDeleteView, self).delete(request, *args, **kwargs)
+        messages.success(self.request, self.object.name+ self.success_message)
+        return super(AdminTeacherDeleteView, self).delete(request, *args, **kwargs)
 
-class AdminSliderDetailView(AdminRequiredMixin, DetailView):
-    template_name = "admintemplates/sliderdetail.html"
-    model = Slider
-    context_object_name = "sliderobj"
+class AdminTeacherDetailView(AdminRequiredMixin, DetailView):
+    template_name = "admintemplates/adminteacherdetail.html"
+    model = Teacher
+    context_object_name = "teacherobj"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        teacher = Teacher.objects.get(id=self.kwargs['pk'])
+        fee = SubjectFee.objects.filter(teacher=teacher)
+        context['fee'] = fee
+        return context
 
 class AdminTicketList(AdminRequiredMixin, TemplateView):
     template_name = "admintemplates/ticketlist.html"

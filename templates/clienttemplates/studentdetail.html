@@ -1,13 +1,17 @@
 {% extends "clienttemplates/studentbase.html" %}
 {% load static %}
 {% block content %}
-<h1>{{studentdetail.name}}</h1>
-<p>Phone_no: {{studentdetail.phone_no}}</p>
-<p>Email:{{studentdetail.email}}</p>
-<p>Address:{{studentdetail.address}}</p>
-<p>Report Card:{{studentdetail.report_card}}</p>
-<p>Course:{{studentdetail.course}}</p>
-<p>Subject:{{studentdetail.subject}}</p>
+<br/>
+<h1>{{studentdetail.name}}</h1><br/>
+<h4>Phone_no: {{studentdetail.phone_no}}</h4><br/>
+<h4>Email:{{studentdetail.email}}</h4><br/>
+<h4>Address:{{studentdetail.address}}</h4><br/>
+<h4>Report Card:{{studentdetail.report_card}}</h4><br/>
+<h4>Tutition Type:{{studentdetail.tuition_type}}</h4><br/>
+<h4>Salary:{{studentdetail.salary}}</h4><br/>
+<h4>Time:{{studentdetail.time}}</h4><br/>
+<h4>Course:{% for c in studentdetail.course.all %}{{c.name}}{% endfor %}</h4><br/>
+<h4>Subject:{% for s in studentdetail.subject.all %}{{s.name}}{% endfor %}</h4>
 <div class="mb-3">
 
     <a class="btn btn-primary" style="width: 25%;"

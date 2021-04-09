@@ -10,22 +10,14 @@
 	<div class="container-fluid">
 		
 		<!-- Title -->
-		<div class="row heading-bg">
+		<div class="row heading-bg mb-2 mt-4">
 			<div class="col-lg-3 col-md-4 col-sm-4 col-xs-12">
 			  <h5 class="txt-dark">Ticket Raise #{{ticketraisedetail.id}}</h5>
 			</div>
-			<!-- Breadcrumb -->
-			<div class="col-lg-9 col-sm-8 col-md-8 col-xs-12">
-			  <ol class="breadcrumb">
-				<li><a href="{% url 'hometuitionapp:teacherhome' %}">Home</a></li>
-				<li class="active"><span>Ticket Raise #{{ticketraisedetail.id}}</span></li>
-			  </ol>
-			</div>
-			<!-- /Breadcrumb -->
 		</div>
 		<!-- /Title -->
 		<!-- Row -->
-		<div class="row">
+		<div class="row mt-4">
 			<div class="col-sm-12 col-md-4">
 				<div class="panel panel-default card-view">
 					<div class="panel-heading">
@@ -61,12 +53,12 @@
 									</div>
 									<div class="panel-wrapper collapse in">
 										<div class="panel-body pa-0">
-											<div id="ajaxticketraiseremark">
+											<div id="ajaxticketraiseremark" class="pre-scrollable overflow-auto" style="max-height: 216px; padding-left: 10px; padding-right: 10px;">
 												<div class="chat-content">
-													<ul class="chatapp-chat-nicescroll-bar pt-20">
+													<ul class="chatapp-chat-nicescroll-bar pt-20" style="list-style-type: none;">
 														{% for remark in ticketraisedetail.ticketraiseremark_set.all|dictsort:"created_at" %}
 														{% if remark.is_problem_solver %}
-														<li class="friend">
+														<li class="friend mb-4">
 															<div class="friend-msg-wrap">
 																
 																<div class="msg pull-left">
@@ -79,9 +71,10 @@
 															</div>	
 														</li>
 														{% else %}
-														<li class="self mb-10">
+														<li class="self mb-4">
 															<div class="self-msg-wrap">
-																<div class="msg block pull-right"> {{remark.issue_remark|striptags|safe}}
+																<div class="msg block pull-right rounded" style="background-color:#00bfff; padding-left: 10px; padding-right: 10px;"> 
+																	<p> {{remark.issue_remark|striptags|safe}} </p>
 																	<div class="msg-per-detail text-right">
 																		<span class="msg-time txt-grey">{{remark.created_at|timesince}} ago</span>
 																	</div>

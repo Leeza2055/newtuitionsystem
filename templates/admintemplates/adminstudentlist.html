@@ -1,38 +1,132 @@
-{% extends "admintemplates/base.html" %}
+{% extends 'admintemplates/base.html' %}
 {% load static %}
+
+{% block title %}{% if request.GET.status %}{{request.GET.status|capfirst}}{% else %}All{% endif %}Student List{% endblock %}
+
+{% block css %}
+<link rel="stylesheet" href="{% static 'operatorstatic/css/plugins/datatables.min.css' %}" />
+<style>
+.image-size{
+    height: 150px;
+    width: 150px;
+    left: 200px;
+    object-fit: contain;
+}
+</style>
+{% endblock %}
+
 {% block content %}
-
-<!-- main-heading -->
-<!-- <h2 class="main-title-w3layouts mb-2 text-center">Widgets</h2> -->
-<!--// main-heading -->
-
-<div class="container-fluid">
-    <div class="row">
-        <div class="outer-w3-agile col-xl">
-            <div class="work-progres">
-                <h4 class="tittle-w3-agileits mb-4">Student List</h4>
-                <hr>
-                <div class="table-responsive">
-                    <table class="table table-hover">
+<div class="breadcrumb">
+    <ul>
+        <li><a title="Click Here to go in Dashboard." href="{% url 'hometuitionapp:adminhome' %}">Dashboard</a></li>
+        <li><a class="reload-page" title="Click Here to Reload this page." onclick="document.location.reload(true)">Student List</a></li>
+    </ul>
+</div>
+<div class="separator-breadcrumb border-top"></div>
+<div id="counting">
+<div class="row mb-4">
+    <div class="col-md-2">
+        <div class="card card-icon mb-4" style="background-color: rgb(21, 95, 179);">
+            <a href="?status=all">
+                <div class="card-body text-center" title="Total number of student that you have: {{allcount}}.">
+                    <p class="text-white mt-2 mb-2">All Students</p>
+                    <p class="lead text-white text-22 m-0">{{allcount}}</p>
+                </div>
+            </a>
+        </div>
+    </div>
+    <div class="col-md-2">
+        <div class="card card-icon mb-4" style="background-color: rgb(15, 189, 73);">
+            <a href="?status=Active">
+                <div class="card-body text-center" title="Total number of active student: {{active}}.">
+                    <p class="text-white mt-2 mb-2">Active Students</p>
+                    <p class="lead text-white text-22 m-0">{{active}}</p>
+                </div>
+            </a>
+        </div>
+    </div>
+    <div class="col-md-2">
+        <div class="card card-icon mb-4" style="background-color: rgb(192, 202, 11);">
+            <a href="?status=Inactive">
+                <div class="card-body text-center" title="Total number of inactive students: {{inactive}}.">
+                    <p class="text-white mt-2 mb-2">Inactive Students</p>
+                    <p class="lead text-white text-22 m-0">{{inactive}}</p>
+                </div>
+            </a>
+        </div>
+    </div>
+    <div class="col-md-2">
+        <div class="card card-icon mb-4" style="background-color: rgb(202, 11, 11);">
+            <a href="?status=Disabled">
+                <div class="card-body text-center" title="Total number of disabled students: {{disabled}}.">
+                    <p class="text-white mt-2 mb-2">Disabled Students</p>
+                    <p class="lead text-white text-22 m-0">{{disabled}}</p>
+                </div>
+            </a>
+        </div>
+    </div>
+</div>
+</div>
+<div class="row mb-4">
+    <div class="col-md-12 mb-4">
+        <div class="card text-left">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-8">
+                        <h4 class="card-title mb-3"><a title="Click here to load student List Page." href="{% url 'hometuitionapp:adminstudentlist' %}"> {% if request.GET.status %}{{request.GET.status|capfirst}}{% else %}All{% endif %}
+                                students</a></h4>
+                        <!-- <p>Here you can manage all students. <span class="green-note">(Hover student Title to view student Image.)</span> </p> -->
+                        <!-- <select name="" id="paginate_by">
+                            <option value="25">25</option>
+                            <option value="50">50</option>
+                            <option value="100">100</option>
+                            <option value="all">all</option>
+                        </select> -->
+                    </div>
+                    <div class="col-md-4">
+                        <p>
+                            <input type="search" name="search" class="form-control" id="b-search"
+                                placeholder="Type any keyword and press Enter." value="{{request.GET.keyword}}">
+                        </p>
+                        <br>
+                        
+                    </div>
+                </div>
+                <div class="table-responsive mt-2">
+                    <table class="display table table-striped table-bordered"
+                        style="width:100%">
                         <thead>
-                            <tr>
-                                <th>#</th>
+                            <tr style="background-color: black; color: white;">
+                                <th>SN</th>
                                 <th>Name</th>
-                                <th>Created</th>
-                                <th>Status</th> 
+                                <th>Created At</th>
+                                <th>Status</th>
                                 <th>Action</th>
                             </tr>
                         </thead>
                         <tbody>
-                            {% for student in studentlist %}
-                                    <tr>
-                                        <td>{{forloop.counter}}</td>
-                                        <td><a href="{% url 'hometuitionapp:adminstudentdetail' student.pk %}">{{student.name}}</a></td>
-                                        <td>{{student.created_at}}</td>
-                                        <td>{% if student.active %}active{% else %}inactive{% endif %}</td>
-                                        <td><a href="{% url 'hometuitionapp:adminstudentupdate' student.pk %}" class="btn btn-primary btn-sm">Update</a>
-                                        <a href="{% url 'hometuitionapp:adminstudentdelete' student.pk %}" class="btn btn-danger btn-sm">Delete</a></td>
-                                    </tr>
+                            {% for student in all_students %}
+                            <tr>
+                                <th>{{forloop.counter}}</th>
+                                <th>
+                                    <!-- <a class="image-pointer" rel="popover" data-img="{{student.image.url}}"> -->
+                                        {{student.name}} 
+                                    <!-- </a> -->
+                                </th>
+                                <th>{{student.created_at}} </th>
+                                <th>
+                                    <label class="switch pr-5 switch-success mr-3" title="Click to change status of {{student.name}}."><span class="student-label">{{student.status}}</span>
+                                        <input type="checkbox" data-id="{{student.id}}" data-title="{{student.name}}" class="studentstatus" data-href="" {% if student.status == "Active" %}checked="checked"{% endif %} /><span class="slider"></span>
+                                    </label>
+                                </th>
+                                <th>
+                                    <a data-toggle="modal" title="View Detail {{student.name}}" data-target="#detail-modal" data-remote="{% url 'hometuitionapp:adminstudentdetail' student.id %}" class="btn btn-primary m-1 del-icon text-white">Detail</a>
+                                    {% comment %}
+                                    <a href="{% url 'hometuitionapp:adminstudentupdate' student.id %}" class="btn btn-warning" title="Update {{student.name}} Info">Update</a>
+                                    <a data-toggle="modal" title="Delete {{student.name}}" data-target="#delete-modal" data-remote="{% url 'hometuitionapp:adminstudentdelete' student.id %}" class="btn btn-danger m-1 del-icon">Delete</a>
+                                    {% endcomment %}
+                                </th>
+                            </tr>
                             {% endfor %}
                         </tbody>
                     </table>
@@ -41,5 +135,87 @@
         </div>
     </div>
 </div>
+
+{% endblock %}
+
+{% block js %}
+<script src="{% static 'operatorstatic/js/plugins/datatables.min.js' %}"></script>
+<script src="{% static 'operatorstatic/js/scripts/datatables.script.min.js' %}"></script>
+
+<script type="text/javascript">
+    $('body').on('click', '.studentstatus', function(e){
+      e.preventDefault();
+      $this = $(this);
+      var title = $this.attr('data-title');
+      var btn = $('.studentstatus')
+      $(".studentstatus").prop('disabled', true);
+      $.ajax({
+        method: 'post',
+        data: {
+            'student_id': $this.attr('data-id'),
+            'csrfmiddlewaretoken': "{{csrf_token}}",
+        },
+        success: function(data){
+          $this.prop('checked', !$this.prop('checked'));
+          if ($this.is(':checked')){
+            $this.parent().find('.student-label').text('Active');
+            toastr.success(`${title} Status Changed to Active`, 'Successful')
+            toastr.options = {
+                "closeButton": true,
+                "debug": false,
+                "newestOnTop": false,
+                "progressBar": false,
+                "positionClass": "toast-top-right",
+                "preventDuplicates": false,
+                "onclick": null,
+                "showDuration": "300",
+                "hideDuration": "1000",
+                "timeOut": "5000",
+                "extendedTimeOut": "1000",
+                "showEasing": "swing",
+                "hideEasing": "linear",
+                "showMethod": "fadeIn",
+                "hideMethod": "fadeOut"
+            }
+          } else {
+            $this.parent().find('.student-label').text('Disabled');
+            toastr.warning(`${title} Status Changed to Disabled`, 'Successful')
+            toastr.options = {
+                "closeButton": true,
+                "debug": false,
+                "newestOnTop": false,
+                "progressBar": false,
+                "positionClass": "toast-top-right",
+                "preventDuplicates": false,
+                "onclick": null,
+                "showDuration": "300",
+                "hideDuration": "1000",
+                "timeOut": "5000",
+                "extendedTimeOut": "1000",
+                "showEasing": "swing",
+                "hideEasing": "linear",
+                "showMethod": "fadeIn",
+                "hideMethod": "fadeOut"
+            }
+          }
+          $('.studentstatus').removeAttr("disabled")
+          $('#counting').load(' #counting')
+        }
+      });
+    });
+  </script>
+  <script>
+    var input = document.getElementById("b-search");
+    input.addEventListener("change", function () {
+        var keyword = input.value;
+        var status = "{{request.GET.status}}" || "all";
+        axios.get("{% url 'hometuitionapp:adminstudentlist' %}", { params: { keyword: keyword, } }).then(function (resp) {
+            const doc = document.createElement("div");
+            doc.innerHTML = resp.data;
+            document.querySelector(".table-responsive").innerHTML = doc.querySelector(".table-responsive").innerHTML
+            history.pushState("", "", `?keyword=${keyword}&status=${status}`)
+        })
+    });
+</script>
 
 {% endblock %}

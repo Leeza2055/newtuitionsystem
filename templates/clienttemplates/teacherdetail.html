@@ -1,22 +1,42 @@
 {% extends "clienttemplates/teacherbase.html" %}
 {% load static %}
 {% block content %}
+<br/>
 <h1>{{teacherdetail.name}}</h1>
-<img src="{{teacherdetail.photo.url}}"/>
-<p>Gender: {{teacherdetail.gender}}</p>
-<p>Phone_no: {{teacherdetail.phone_no}}</p>
-<p>Email:{{teacherdetail.email}}</p>
-<p>Address:{{teacherdetail.address}}</p>
-<p>Education:{{teacherdetail.education}}</p>
-<p>Experience:{{teacherdetail.experience}}</p>
-<p>CV:{{teacherdetail.cv}}</p>
-<p>Citizenship:{{teacherdetail.citizenship}}</p>
+<img src="{{teacherdetail.photo.url}}"/><br/>
+<h4 class="mt-4">Gender: {{teacherdetail.gender}}</h4><br/>
+<h4>phone_no: {{teacherdetail.phone_no}}</h4><br/>
+<h4>Email:{{teacherdetail.email}}</h4><br/>
+<h4>Address:{{teacherdetail.address}}</h4><br/>
+<h4>Education:{{teacherdetail.education}}</h4><br/>
+<h4>Experience:{{teacherdetail.teaching_experience}}</h4><br/>
+<h4>Teaching Locations: {{teacherdetail.can_teach_location}}</h4><br/>
+            <h4>Availability: {{teacherdetail.availabilty}}</h4><br/>
+            
 <!-- <p>Course:{{teacherdetail.course}}</p> -->
 
-<p>Course:{% for c in teacherdetail.course.all %}{{c.name}}{% endfor %}</p>
 
-<p>Subject:{% for s in teacherdetail.subject.all %}{{s.name}}{% endfor %}</p>
-<div class="mb-3">
+<table class="table">
+    <thead>
+        <tr>
+            <th>SN</th>
+            <th>Course</th>
+            <th>Subject</th>
+            <th>Amount</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for c in fee %}
+        <tr>
+            <th>{{forloop.counter}}</th>
+            <th>{{c.course}}</th>
+            <th>{{c.subject}}</th>
+            <th>{{c.amount}}</th>
+
+        </tr>
+        {% endfor %}
+    </tbody>
+</table><div class="mb-3">
 
     <a class="btn btn-primary" style="width: 25%;" href="{% url 'hometuitionapp:teacherupdate' request.user.teacher.id %}">Update</a>
     

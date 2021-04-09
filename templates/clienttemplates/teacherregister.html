@@ -6,7 +6,7 @@
 
 <div class="contact-grids1 w3agile-6 registration">
 
-	<h3>Registration Form </h3>
+	<h3>Teacher Registration Form </h3>
 
 <form action="" enctype="multipart/form-data" method="post">
 	{% csrf_token %}
@@ -113,8 +113,13 @@
 						<button type="button" class="btn btn-primary" data-toggle="collapse" data-target="#demo__{{c.id}}">{{c.name}}</button>
 						<div id="demo__{{c.id}}" class="collapse">
 							{% for s in c.subject_set.all %}
-							<label>{{s.name}}</label>
-							<input type="checkbox" name="subject__{{s.id}}">
+							<div class="form-group">
+								<label>{{s.name}}</label>
+								<input type="checkbox" name="subject__{{s.id}}">
+								<label>Price:</label>
+								<input type="number" name="amount__{{s.id}}">
+
+							</div>
 							{% endfor %}
 						</div>
 					</div>
@@ -168,7 +173,12 @@
 			</div>
 		</div>
 		<div class="row">
-			<div class="col-md-12 form-group">
+			<div class="col-md-6 form-group">
+				<input type="checkbox" id="terms_conditions" name="terms_conditions" value="true">
+				<label for="terms_conditions">I agree to <a href="{% url 'hometuitionapp:teacherterms' %}">terms and conditions.</a> </label>
+			</div>
+			<div class="col-md-6 form-group">
+
 				<button type="submit" class="btn btn-primary fa-pull-right">Submit</button>
 			</div>
 			

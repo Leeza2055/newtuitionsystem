@@ -1,16 +1,73 @@
-{% extends "admintemplates/base.html" %}
-{% load static %}
-{% block content %}
-<h3>{{studentdetail.name}}</h3>
-<p>Email:{{studentdetail.email}}</p>
-<p>Address:{{studentdetail.address}}</p>
-<p>Phone No.:{{studentdetail.phone_no}}</p>
-<p>Course:{{studentdetail.course}}</p>
-<p>Subject.:{{studentdetail.subject}}</p>
-<p>Report card: {{studentdetail.report_card}}</p>
+<div class="modal-header">
+    <h4>{{studentobj.name}}</h4>
+	<button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+</div>
+<div class="modal-body">
+    <div class="row">
+        <div class="col-md-6">
+            <div class="row">
+                <div class="col-md-4">
+                    Name:
+                </div>
+                <div class="col-md-8">
+                    <b>{{studentobj.name}}</b>
+                </div>
+            </div>
+            
+            
+            <div class="row">
+                <div class="col-md-4">
+                    Phone_no:
+                </div>
+                <div class="col-md-8">
+                    <b>{{studentobj.phone_no}}</b>
+                </div>
+            </div><div class="row">
+                <div class="col-md-4">
+                    Email:
+                </div>
+                <div class="col-md-8">
+                    <b>{{studentobj.email}}</b>
+                </div>
+            </div><div class="row">
+                <div class="col-md-4">
+                    Address:
+                </div>
+                <div class="col-md-8">
+                    <b>{{studentobj.address}}</b>
+                </div>
+            </div><div class="row">
+                <div class="col-md-4">
+                    Report Card:
+                </div>
+                <div class="col-md-8">
+                    <b><a href="{{studentobj.report_card.url}}" target="_blank">{{studentobj.report_card}}</a></b>
+                </div>
+            </div><div class="row">
+                <div class="col-md-4">
+                    Tuition Type:
+                </div>
+                <div class="col-md-8">
+                    <b>{{studentobj.tuition_type}}</b>
+                </div>
+            </div><div class="row">
+                <div class="col-md-4">
+                    Salary:
+                </div>
+                <div class="col-md-8">
+                    <b>{{studentobj.salary}}</a></b>
+                </div>
+            </div><div class="row">
+                <div class="col-md-4">
+                    Citizenship:
+                </div>
+                <div class="col-md-8">
+                    <b>{{studentobj.time}}</b>
+                </div>
+            </div>
+       
+    </div>
+</div>
 
-
-
-{% endblock %}
 
 

@@ -20,10 +20,48 @@
 <div class="container mb-4">
     <h1>{{profile.name}}</h1>
     <!-- <h3>{{profile.name}}</h3> -->
-    <img src="{{profile.photo.url}}"/>
-    <div class="row"> 
+    <div class="row">
         <div class="col-6 mt-3">
-            <h4 class="mb-3">Description</h4>
+            <img src="{{profile.photo.url}}"/>
+            <div class="form-group col-6 mt-3">
+                <h4 class="mb-3">Review</h4>
+                <hr>
+                <form class="rate-form" action="" method="POST">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <h5>Your Rating</h5> 
+                        <div class="mt-3">
+    
+                            <input type="radio" name="rate" value="1" class="my-btn" id="first"></input><label id="one" class="fas fa-star checked" for="first"></label>
+                            <input type="radio" name="rate" value="2" class="my-btn" id="second"></input><label id="two" class="fas fa-star checked" for="second"></label>
+                            <input type="radio" name="rate" value="3" class="my-btn" id="third"></input><label id="three" class="fas fa-star" for="third"></label>
+                            <input type="radio" name="rate" value="4" class="my-btn" id="fourth"> </input><label id="four" class="fas fa-star" for="fourth"></label>
+                            <input type="radio" name="rate" value="5" class="my-btn" id="fifth"></input><label id="five" class="fas fa-star" for="fifth"></label>
+                        </div>
+                    </div> <hr/>
+                    <div class="mb-3">
+                        <h5>Comment</h5> 
+                        <div class="mt-3">
+                            
+                            <textarea name="comment" id="comment" cols="50" rows="10" placeholder="Your review"></textarea>
+                        </div>
+                    </div><hr/>
+    
+                    <button class="btn btn-primary" type="submit">Submit</button>
+    
+                </form>
+                {% for message in messages %}
+                  <div class="alert {{ message.tags }} alert-dismissible" role="alert" style="width: 100%; margin-left: auto; margin-right: auto;">
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                      <span aria-hidden="true">&times;</span>
+                    </button>
+                    {{ message }}
+                  </div>
+                {% endfor %}
+            </div>
+        </div>
+        <div class="col-6 mt-3">
+            <h3 class="mb-3">Description</h3>
             <hr>
             <div>
                 <div>
@@ -41,41 +79,94 @@
                 </div>
                 <p> {{ profile.countrating }} Review(s) </p>
             </div>
-            <p>Gender: {{profile.gender}}</p>
+            <h4>Gender: {{profile.gender}}</h4><br/>
             <!-- <p>Phone_no: {{profile.phone_no}}</p> -->
-            <p>Email:{{profile.email}}</p>
-            <p>Address:{{profile.address}}</p>
-            <p>Education:{{profile.education}}</p>
-            <p>Experience:{{profile.experience}}</p>
+            <h4>Email:{{profile.email}}</h4><br/>
+            <h4>Address:{{profile.address}}</h4><br/>
+            <h4>Education:{{profile.education}}</h4><br/>
+            <h4>Experience:{{profile.teaching_experience}}</h4><br/>
             <!-- <p>CV:{{profile.cv}}</p>
             <p>Citizenship:{{profile.citizenship}}</p> -->
-            
-            <p>Course:{% for c in profile.course.all %}{{c.name}}{% endfor %}</p>
-            <p>Subject:{% for s in profile.subject.all %}{{s.name}}{% endfor %}</p>
-            <a class="hire_teacher btn btn-success">Hire</a>
+            <h4>Teaching Locations: {{profile.can_teach_location}}</h4><br/>
+            <h4>Availability: {{profile.availabilty}}</h4><br/>
+            <br/>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>SN</th>
+                        <th>Course</th>
+                        <th>Subject</th>
+                        <th>Amount</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for c in fee %}
+                    <tr>
+                        <th>{{forloop.counter}}</th>
+                        <th>{{c.course}}</th>
+                        <th>{{c.subject}}</th>
+                        <th>{{c.amount}}</th>
+
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            <br/>
+            <div>
+                <h4>Choose subject to hire this Teacher</h4>
+                <div>
+                    <select id="selcourse">
+                        {% for subject in fee %}
+
+                        <option value="{{subject.subject.id}}">
+                            Course: {{subject.course}}
+                            Subject: {{subject.subject}}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+            <br/>
+            <div>
+
+                <a class="hire_teacher btn btn-success">Hire</a>
+            </div>
 
         </div>    
-        <div class="form-group col-6 mt-3">
-            <h4 class="mb-3">Your Rating</h4>
-            <hr>
-            <form class="rate-form" action="" method="POST">
-                {% csrf_token %}
-                <input type="radio" name="rate" value="1" class="my-btn" id="first"></input><label id="one" class="fas fa-star checked" for="first"></label>
-                <input type="radio" name="rate" value="2" class="my-btn" id="second"></input><label id="two" class="fas fa-star checked" for="second"></label>
-                <input type="radio" name="rate" value="3" class="my-btn" id="third"></input><label id="three" class="fas fa-star" for="third"></label>
-                <input type="radio" name="rate" value="4" class="my-btn" id="fourth"> </input><label id="four" class="fas fa-star" for="fourth"></label>
-                <input type="radio" name="rate" value="5" class="my-btn" id="fifth"></input><label id="five" class="fas fa-star" for="fifth"></label>
-
-                <button type="submit">Submit</button>
-
-            </form>
-            {% for message in messages %}
-              <div class="alert {{ message.tags }} alert-dismissible" role="alert" style="width: 70%; margin-left: auto; margin-right: auto;">
-                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                  <span aria-hidden="true">&times;</span>
-                </button>
-                {{ message }}
-              </div>
+        
+    </div>
+    <div class="row mt-4">
+            
+        <div class="col-6 mt-3">
+            <h4>Comments</h4> <hr/>
+            {% for profile in profile.comment%}
+            <div class="row">
+                <div class="col-4">
+                    <p style="font-size: 10px;">{{ profile.updated_at }}</p>
+                </div>
+                <div class="col-4">
+                    <p>{{ profile.rate |stringformat:".2f" }}</p>
+                </div>
+                <div class="col-4">
+                    <div>
+                        <i class="{% if profile.rate >= 1 %}fas fa-star checked {% endif%} 
+                            {% if profile.rate < 1 %}fas fa-star {% endif%}"></i>
+                        <i class="{% if profile.rate >= 2 %}fas fa-star checked {% endif%}
+                            {% if profile.rate < 2 %}fas fa-star {% endif%}"></i>
+                        <i class="{% if profile.rate >= 3 %}fas fa-star checked {% endif%}
+                            {% if profile.rate < 3 %}fas fa-star {% endif%}"></i>
+                        <i class="{% if profile.rate >= 4 %}fas fa-star checked {% endif%}
+                            {% if profile.rate < 4 %}fas fa-star {% endif%}"></i>
+                        <i class="{% if profile.rate >= 5 %}fas fa-star checked {% endif%} 
+                            {% if profile.rate < 5 %}fas fa-star {% endif%}"></i>
+                    </div>
+                </div>
+                                
+                <div class="col-6">
+                <h5>{{ profile.comment }}</h5>
+                </div>
+            </div>
+            <hr/>
             {% endfor %}
         </div>
     </div>
@@ -87,12 +178,14 @@
 <script type="text/javascript">
     $('.hire_teacher').on('click', function(e){
         e.preventDefault();
-        var teacher_id = "{{profile.id}}"
+        var teacher_id = "{{profile.id}}";
+        var subject = $('#selcourse').val()
         $.ajax({
             method: 'post',
             url: "{% url 'hometuitionapp:ajaxhireteacher' %}",
             data: {
                 'teacher_id': teacher_id,
+                'subject_id': subject,
                 'csrfmiddlewaretoken': '{{csrf_token}}',
             },
             success: function(data){

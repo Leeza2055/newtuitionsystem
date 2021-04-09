@@ -29,7 +29,7 @@
                             			<td>{{forloop.counter}}</td>
                             			<td>{{course.name}}</td>
                             			<td>{{course.created_at}}</td>
-                            			<td>{% if course.active %}active{% else %}inactive{% endif %}</td>
+                            			<td>{% if course.status == "Active" %}active{% else %}disabled{% endif %}</td>
                             			<td><a href="{% url 'hometuitionapp:admincourseupdate' course.pk %}" class="btn btn-primary btn-sm">Update</a>
                             			<a href="{% url 'hometuitionapp:admincoursedelete' course.pk %}" class="btn btn-danger btn-sm">Delete</a></td>
                             		</tr>

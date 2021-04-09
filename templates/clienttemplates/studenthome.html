@@ -49,7 +49,8 @@
 					<img src="{{teacher.photo.url}}"/>
 					<h1><a href="{% url 'hometuitionapp:teacherprofile' teacher.pk %}">{{teacher.name}}</a></h1>
 					<h2>Education:{{teacher.education}}</h2>
-					<h2>Experience: {{teacher.experience}} </h2>
+					<h2>Experience: {{teacher.teaching_experience}}
+					</h2>
 				</div>
 				{% endfor %}
 			</div>

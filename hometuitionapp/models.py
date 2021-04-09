@@ -127,6 +127,10 @@ class Teacher(TimeStamp):
         if ratings["count"] is not None:
             cnt = int(ratings["count"])
         return cnt
+    
+    def comment(self):
+        review = Rating.objects.filter(teacher=self)
+        return review
 
     class Meta:
         ordering = ['id']
@@ -149,6 +153,7 @@ class Rating(models.Model):
     teacher = models.ForeignKey(Teacher,on_delete=models.CASCADE)
     user = models.OneToOneField(User,on_delete=models.CASCADE, null=True, blank=True)
     rate = models.IntegerField(default=0)
+    comment = models.TextField(null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -197,17 +202,21 @@ class TeacherStudentFee(TimeStamp):
 class Hiring(models.Model):
     teacher = models.ForeignKey(Teacher, on_delete=models.CASCADE)
     student = models.ForeignKey(Student, on_delete=models.CASCADE)
-    user = models.OneToOneField(User, on_delete=models.CASCADE, null=True, blank=True)
+    subject = models.ForeignKey(Subject, on_delete=models.SET_NULL, null=True, blank=True)
     hire_date = models.DateTimeField(auto_now=True)
     accept = models.BooleanField(default=False)
+    reject = models.BooleanField(default=False)
+    amount = models.PositiveIntegerField(default=0)
+    payment_status = models.BooleanField(default=False)
+    payment_date = models.DateTimeField(null=True, blank=True)
 
     def __str__(self):
         return self.teacher.name
 
 # class Payment(models.Model):
-#     teacher = models.ForeignKey(Teacher, on_delete=models.CASCADE)
+    # hiring = models.ForeignKey(Hiring, on_delete=models.CASCADE)
 #     student = models.ForeignKey(Student, on_delete=models.CASCADE)
-#     amount = models.IntegerField(default=2500)
+    # amount = models.IntegerField(default=2500)
 #     paid = models.BooleanField(default=False)
 #     payment_date = models.DateTimeField(auto_now=True)
 
@@ -300,8 +309,7 @@ class Notice(TimeStamp):
 TICKET_REQUEST_LIMIT = models.Q(app_label='hometuitionapp', model='teacher') | models.Q(
     app_label='hometuitionapp', model='student')
 
-TICKET_RECEIVER_LIMIT = models.Q(app_label='hometuitionapp', model='hometuitionsystem') | models.Q(
-    app_label='hometuitionapp', model='teacher')
+TICKET_RECEIVER_LIMIT = models.Q(app_label='hometuitionapp', model='hometuitionsystem')
 
 ISSUE_TYPE = (
     ('General', 'General'),

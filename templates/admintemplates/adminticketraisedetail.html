@@ -1,7 +1,7 @@
 {% extends 'admintemplates/base.html' %}
 {% load static %}
-
 {% block css %}
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
 
 {% endblock %}
 {% block content %}
@@ -14,14 +14,6 @@
 			<div class="col-lg-3 col-md-4 col-sm-4 col-xs-12">
 			  <h5 class="txt-dark">Ticket Raise #{{ticketraisedetail.id}}</h5>
 			</div>
-			<!-- Breadcrumb -->
-			<div class="col-lg-9 col-sm-8 col-md-8 col-xs-12">
-			  <ol class="breadcrumb">
-				<li><a href="{% url 'hometuitionapp:adminhome' %}">Home</a></li>
-				<li class="active"><span>Ticket Raise #{{ticketraisedetail.id}}</span></li>
-			  </ol>
-			</div>
-			<!-- /Breadcrumb -->
 		</div>
 		<!-- /Title -->
 		<!-- Row -->
@@ -62,28 +54,29 @@
 									<div class="panel-heading ma-0 pt-15 text-center">
 										<span class="inline-block txt-dark" style="font-size: 18px;">MESSAGES</span>
 									</div>
-                                    <div id="ajaxticketraiseremark">
+                                    <div id="ajaxticketraiseremark" class="pre-scrollable overflow-auto" style="max-height: 216px; padding-left: 10px; padding-right: 10px;">
                                         <div class="chat-content">
-                                            <ul class="chatapp-chat-nicescroll-bar pt-20">
+                                            <ul class="chatapp-chat-nicescroll-bar pt-20" style="list-style-type: none;">
                                                 {% for remark in ticketraisedetail.ticketraiseremark_set.all|dictsort:"created_at" %}
                                                 {% if remark.is_problem_solver %}
-                                                <li class="self mb-10">
+                                                <li class="self mb-4">
                                                     <div class="self-msg-wrap">
-                                                        <div class="msg block pull-right"> {{remark.issue_remark|striptags|safe}}
-                                                            <div class="msg-per-detail text-right">
-                                                                <span class="msg-time txt-grey">{{remark.created_at}}</span> <span class="msg-time txt-grey">({{remark.created_at|timesince}} ago)</span>
+                                                        <div class="msg pull-right rounded" style="background-color:#00bfff; padding-left: 10px; padding-right: 10px;"> 
+															<p> {{remark.issue_remark|striptags|safe}} </p> 
+                                                            <div class="msg-per-detail pull-right">
+                                                                 <span class="msg-time txt-grey">({{remark.created_at|timesince}} ago)</span>
                                                             </div>
                                                         </div>
                                                         <div class="clearfix"></div>
                                                     </div>	
                                                 </li>
                                                 {% else %}
-                                                <li class="friend">
+                                                <li class="friend mb-4">
                                                     <div class="friend-msg-wrap">
                                                         <div class="msg pull-left">
                                                             <p>{{remark.issue_remark|striptags|safe}}</p>
-                                                            <div class="msg-per-detail text-right">
-                                                                <span class="msg-time txt-grey">{{remark.created_at}}</span> <span class="msg-time txt-grey">({{remark.created_at|timesince}} ago)</span>
+                                                            <div class="msg-per-detail pull-left">
+                                                                 <span class="msg-time txt-grey">({{remark.created_at|timesince}} ago)</span>
                                                             </div>
                                                         </div>
                                                         <div class="clearfix"></div>

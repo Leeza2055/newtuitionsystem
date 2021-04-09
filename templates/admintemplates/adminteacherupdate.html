@@ -1,10 +1,125 @@
-{% extends "admintemplates/base.html" %}
+{% extends 'admintemplates/base.html' %}
+{% load static %}
+
+{% block title %}
+Update Teacher
+{% endblock %}
+{% block css %}
+<link href="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/css/select2.min.css" rel="stylesheet" />
+<link rel="stylesheet" href="{% static 'operatorstatic/css/plugins/ladda-themeless.min.css' %}" />
+
+<style>
+    .errorlist,
+    .required {
+        color: red;
+    }
+
+    .required {
+        font-size: 15px;
+    }
+
+    .select2 {
+        width: 100% !important;
+    }
+</style>
+{% endblock %}
+
 {% block content %}
-<h4>Register Form</h4>
-<form enctype="multipart/form-data" method="POST">
-	{% csrf_token %}
-	{{form.as_p}}
-	{{error}}
-	<button>Signup</button>	
+<div class="breadcrumb">
+    <ul>
+        <li><a href="{% url 'hometuitionapp:adminhome' %}">Dashboard</a></li>
+        <li><a href="{% url 'hometuitionapp:adminteacherlist' %}">All Teachers</a></li>
+        <li>
+			Update Teacher
+        </li>
+    </ul>
+</div>
+<div class="separator-breadcrumb border-top"></div>
+<form method="POST" enctype="multipart/form-data" id="slider_create_update">
+    {% csrf_token %}
+    <div class="row">
+        <div class="col-md-12">
+            {{form.non_field_errors}}
+            <div class="card mb-4">
+                <div class="card-body">
+                    <div class="card-title mb-3">Teacher Informations</div><hr>
+                    <div class="row">
+                        <div class="col-md-6 form-group mb-3">
+                            <label for="id_title">Name</label>
+                            {{form.name}}
+                        </div>
+                        
+                        <div class="col-md-6 form-group mb-3">
+                            <label for="id_caption">Photo</label>
+                            {{form.photo}}
+                        </div>
+                        <div class="col-md-6 form-group mb-3">
+                            <label for="id_image">Email</label>
+                            {{form.email}}
+                        </div>
+                        <div class="col-md-12 form-group mb-3">
+                            <label for="id_status">Address</label>
+                            {{form.address}}
+                        </div>
+						<div class="col-md-6 form-group mb-3">
+                            <label for="id_image">Education</label>
+                            {{form.education}}
+                        </div>
+                        <div class="col-md-12 form-group mb-3">
+                            <label for="id_status">cv</label>
+                            {{form.cv}}
+                        </div><div class="col-md-6 form-group mb-3">
+                            <label for="id_image">CitizenShip</label>
+                            {{form.citizenship}}
+                        </div>
+                        <div class="col-md-12 form-group mb-3">
+                            <label for="id_status">Can Teach_Location</label>
+                            {{form.can_teach_location}}
+                        </div><div class="col-md-6 form-group mb-3">
+                            <label for="id_image">Email</label>
+                            {{form.teaching_experience}}
+                        </div>
+                        <div class="col-md-12 form-group mb-3">
+                            <label for="id_status">Training License</label>
+                            {{form.training_license}}
+                        </div><div class="col-md-6 form-group mb-3">
+                            <label for="id_image">Availabilty</label>
+                            {{form.availabilty}}
+                        </div>
+                        <div class="col-md-12 form-group mb-3">
+                            <label for="id_status">reference_person</label>
+                            {{form.reference_person}}
+                        </div>
+						<div claa="col-md-12 form-group mb-3">
+							<label for="id_refenrence.num"><div class="col-md-12 form-group mb-3">
+								<label for="id_refenrence.num">reference_person_contact</label>
+								{{form.reference_person_contact_no}}
+							</div></label>
+						</div>
+						
+
+						
+                    </div>
+                    <hr>
+                    <button class="btn btn-info submitted_button">Save Teacher</button>
+                </div>
+            </div>
+        </div>
+    </div>
 </form>
+{% endblock %}
+
+{% block js %}
+<script src="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/js/select2.min.js"></script>
+<script src=" {% static 'operatorstatic/js/plugins/spin.min.js' %} "></script>
+<script src=" {% static 'operatorstatic/js/plugins/ladda.min.js' %} "></script>
+<script src=" {% static 'operatorstatic/js/scripts/ladda.script.min.js' %} "></script>
+<script type="text/javascript">
+    $('.submitted_button').on('click', function(e) {
+        var laddaBtn = e.currentTarget;
+        var l = Ladda.create(laddaBtn);
+        l.start();
+        document.getElementById("slider_create_update").submit();
+    })
+</script>
 {% endblock %}
